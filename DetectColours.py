@@ -21,14 +21,28 @@ for (lower, upper) in boundaries:
 
     # # http://docs.opencv.org/3.2.0/d4/d73/tutorial_py_contours_begin.html, 2017-02-02
     # im2, contours, heiarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    # # im2, contours, heiarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # print contours
-    # # print contour
     # cv2.drawContours(image, contours, -1, (255, 0, 0), 3)
 
-    # dst = cv2.cornerHarris(image, 10, )
-    edges = cv2.Canny(image, 225, 250)
-    print edges[78] # element of edges represents pixels in a row (width)
-    # # show the images
+    # http://www.pyimagesearch.com/2015/04/06/zero-parameter-automatic-canny-edge-detection-with-python-and-opencv/, 2017-02-02
+    edges = cv2.Canny(image, 225, 250) # element of edges represents pixels in a row (width)
+
+    for row in edges:
+        if 255 in row:
+            pix_i = 0
+            starts = []
+            ends = []
+            while pix_i < len(row):
+                start = pix_i
+                while (row[pix_i] == 255):
+                    pix_i += 1
+                if pix_i > (start + 10):
+                    starts.append(start)
+                    ends.append(pix_i)
+                pix_i += 1
+            break
+
+    print starts, ends
+
+    # # # show the images
     cv2.imshow("images", np.hstack([image[:,:,1], edges]))
     cv2.waitKey(0)
