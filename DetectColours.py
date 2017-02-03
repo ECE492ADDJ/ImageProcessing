@@ -19,11 +19,16 @@ for (lower, upper) in boundaries:
     mask = cv2.inRange(image, lower, upper)
     output = cv2.bitwise_and(image, image, mask = mask)
 
+    # # http://docs.opencv.org/3.2.0/d4/d73/tutorial_py_contours_begin.html, 2017-02-02
     # im2, contours, heiarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    im2, contours, heiarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # print contour
-    cv2.drawContours(image, contours, -1, (255, 0, 0), 3)
+    # # im2, contours, heiarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # print contours
+    # # print contour
+    # cv2.drawContours(image, contours, -1, (255, 0, 0), 3)
 
+    # dst = cv2.cornerHarris(image, 10, )
+    edges = cv2.Canny(image, 225, 250)
+    print edges[78] # element of edges represents pixels in a row?
     # # show the images
-    cv2.imshow("images", np.hstack([image, output]))
+    cv2.imshow("images", np.hstack([image[:,:,1], edges]))
     cv2.waitKey(0)
