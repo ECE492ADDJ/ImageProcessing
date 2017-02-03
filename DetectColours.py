@@ -26,20 +26,23 @@ for (lower, upper) in boundaries:
     # http://www.pyimagesearch.com/2015/04/06/zero-parameter-automatic-canny-edge-detection-with-python-and-opencv/, 2017-02-02
     edges = cv2.Canny(image, 225, 250) # element of edges represents pixels in a row (width)
 
-    for row in edges:
-        if 255 in row:
+    starts = {}
+    ends = {}
+    for row_i in range(0, len(edges)):
+        if 255 in edges[row_i]:
             pix_i = 0
-            starts = []
-            ends = []
-            while pix_i < len(row):
+            while pix_i < len(edges[row_i]):
                 start = pix_i
-                while (row[pix_i] == 255):
+                while (edges[row_i][pix_i] == 255):
                     pix_i += 1
                 if pix_i > (start + 10):
-                    starts.append(start)
-                    ends.append(pix_i)
+                    if row_i not in starts:
+                        starts[row_i] = []
+                        ends[row_i] = []
+                    starts[row_i].append(start)
+                    ends[row_i].append(pix_i)
                 pix_i += 1
-            break
+            # break
 
     print starts, ends
 
