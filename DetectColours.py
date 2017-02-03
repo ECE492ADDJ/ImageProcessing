@@ -28,7 +28,7 @@ for (lower, upper) in boundaries:
 
     # dst = cv2.cornerHarris(image, 10, )
     edges = cv2.Canny(image, 225, 250)
-    print edges[78] # element of edges represents pixels in a row?
+    print len(edges[78]) # element of edges represents pixels in a row?
     # # show the images
     cv2.imshow("images", np.hstack([image[:,:,1], edges]))
     cv2.waitKey(0)
