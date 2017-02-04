@@ -17,16 +17,12 @@ for (lower, upper) in boundaries:
     lower = np.array(lower, dtype = "uint8")
     upper = np.array(upper, dtype = "uint8")
 
-    # # find the colors within the specified boundaries and apply the mask
-    # mask = cv2.inRange(image, lower, upper)
-    # output = cv2.bitwise_and(image, image, mask = mask)
-
     # http://www.pyimagesearch.com/2015/04/06/zero-parameter-automatic-canny-edge-detection-with-python-and-opencv/, 2017-02-02
     edges = cv2.Canny(image, 225, 250) # element of edges represents pixels in a row (width)
 
     # Dicts to hold starting pixels and end pixels of corners in rows
-    starts = {}
-    ends = {}
+    row_starts = {}
+    row_ends = {}
     for row_i in range(0, len(edges)):
         if 255 in edges[row_i]: # If there are any detected edge pixels
             pix_i = 0
@@ -38,31 +34,59 @@ for (lower, upper) in boundaries:
                     pix_i += 1
                 # If the edge is of significant size (not noise)
                 if pix_i > (start + SIG_LENGTH):
-                    # Make a list of starts and ends of significant edges in row
-                    if row_i not in starts:
-                        starts[row_i] = []
-                        ends[row_i] = []
-                    starts[row_i].append(start)
-                    ends[row_i].append(pix_i)
+                    # Make a list of row_starts and row_ends of significant edges in row
+                    if row_i not in row_starts:
+                        row_starts[row_i] = []
+                        row_ends[row_i] = []
+                    row_starts[row_i].append(start)
+                    row_ends[row_i].append(pix_i)
                 pix_i += 1
 
-    midlines = []
-    # Compute midpoints of each edge, and save pixel indices as tuples
-    for k in starts.keys():
-        for ind in range(0, len(starts[k])):
-            midpoint = int((ends[k][ind] + starts[k][ind]) / 2)
-            midlines.append((midpoint, k))
+    # Dicts to hold starting pixels and end pixels of corners in rows
+    col_starts = {}
+    col_ends = {}
+    for col_i in range(0, len(edges[0])): # over number of columns in one row
+        pix_i = 0
+        # iterate through all pixels in the col
+        while pix_i < len(edges):
+            start = pix_i
+            # Move down an edge in the col, saving the start of the edge
+            while (edges[pix_i][col_i] == 255):
+                pix_i += 1
+            # If the edge is of significant size (not noise)
+            if pix_i > (start + SIG_LENGTH):
+                # Make a list of col_starts and col_ends of significant edges in col
+                if col_i not in col_starts:
+                    col_starts[col_i] = []
+                    col_ends[col_i] = []
+                col_starts[col_i].append(start)
+                col_ends[col_i].append(pix_i)
+            pix_i += 1
 
-    print midlines
+    midrows = []
+    # Compute midpoints of each edge, and save pixel indices as tuples
+    for k in row_starts.keys():
+        for ind in range(0, len(row_starts[k])):
+            midpoint = int((row_ends[k][ind] + row_starts[k][ind]) / 2)
+            midrows.append((midpoint, k))
+
+    midcols = []
+    # Compute midpoints of each edge, and save pixel indices as tuples
+    for k in col_starts.keys():
+        for ind in range(0, len(col_starts[k])):
+            midpoint = int((col_ends[k][ind] + col_starts[k][ind]) / 2)
+            midcols.append((k, midpoint))
 
     # http://docs.opencv.org/2.4/modules/core/doc/drawing_functions.html
-    for ind in range(0, len(midlines)):
-        cv2.circle(image, midlines[ind], 5, (255, 0, 0), -1)
-        # cv2.line(image, midlines[ind], midlines[ind+1], (255, 0, 0))
+    for ind in range(0, len(midrows)):
+        cv2.circle(image, midrows[ind], 5, (255, 0, 0), -1)
 
-    # # show the images
-    # cv2.imshow("images", np.hstack([image]))
-    # cv2.waitKey(0)
+    for ind in range(0, len(midcols)):
+        cv2.circle(image, midcols[ind], 5, (255, 255, 0), -1)
+
+    # show the images
+    cv2.imshow("images", np.hstack([image]))
+    cv2.waitKey(0)
 
     # cv2.imwrite("maze_points.png", image)
 
