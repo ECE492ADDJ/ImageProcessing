@@ -17,9 +17,9 @@ for (lower, upper) in boundaries:
     lower = np.array(lower, dtype = "uint8")
     upper = np.array(upper, dtype = "uint8")
 
-    # find the colors within the specified boundaries and apply the mask
-    mask = cv2.inRange(image, lower, upper)
-    output = cv2.bitwise_and(image, image, mask = mask)
+    # # find the colors within the specified boundaries and apply the mask
+    # mask = cv2.inRange(image, lower, upper)
+    # output = cv2.bitwise_and(image, image, mask = mask)
 
     # http://www.pyimagesearch.com/2015/04/06/zero-parameter-automatic-canny-edge-detection-with-python-and-opencv/, 2017-02-02
     edges = cv2.Canny(image, 225, 250) # element of edges represents pixels in a row (width)
@@ -46,11 +46,6 @@ for (lower, upper) in boundaries:
                     ends[row_i].append(pix_i)
                 pix_i += 1
 
-    # for k in starts.keys():
-    #     print str(k) + ": "
-    #     print starts[k]
-    #     print ends[k]
-
     midlines = []
     # Compute midpoints of each edge, and save pixel indices as tuples
     for k in starts.keys():
@@ -60,9 +55,25 @@ for (lower, upper) in boundaries:
 
     print midlines
 
-    for ind in range(0, len(midlines) - 1):
-        cv2.line(image, midlines[ind], midlines[ind+1], (255, 0, 0))
+    # http://docs.opencv.org/2.4/modules/core/doc/drawing_functions.html
+    for ind in range(0, len(midlines)):
+        cv2.circle(image, midlines[ind], 5, (255, 0, 0), -1)
+        # cv2.line(image, midlines[ind], midlines[ind+1], (255, 0, 0))
 
-    # show the images
-    cv2.imshow("images", np.hstack([image]))
-    cv2.waitKey(0)
+    # # show the images
+    # cv2.imshow("images", np.hstack([image]))
+    # cv2.waitKey(0)
+
+    # cv2.imwrite("maze_points.png", image)
+
+
+"""
+
+1. Flatten image - make every e.g. 16x16 block the floor/ceiling
+
+2. Find intermediate nodes, too
+
+3. Look at pixel groups that include walls - detect what wall
+    shape is around (corner, etc.)
+
+"""
