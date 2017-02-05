@@ -63,26 +63,58 @@ for (lower, upper) in boundaries:
                 col_ends[col_i].append(pix_i)
             pix_i += 1
 
-    midrows = []
-    # Compute midpoints of each edge, and save pixel indices as tuples
-    for k in row_starts.keys():
-        for ind in range(0, len(row_starts[k])):
-            midpoint = int((row_ends[k][ind] + row_starts[k][ind]) / 2)
-            midrows.append((midpoint, k))
-
-    midcols = []
-    # Compute midpoints of each edge, and save pixel indices as tuples
-    for k in col_starts.keys():
-        for ind in range(0, len(col_starts[k])):
-            midpoint = int((col_ends[k][ind] + col_starts[k][ind]) / 2)
-            midcols.append((k, midpoint))
+    intersects = []
+    for ci in col_starts.keys():
+        for ri in row_starts.keys():
+            intersects.append((ci, ri))
 
     # http://docs.opencv.org/2.4/modules/core/doc/drawing_functions.html
-    for ind in range(0, len(midrows)):
-        cv2.circle(image, midrows[ind], 5, (255, 0, 0), -1)
+    for ind in range(0, len(intersects)):
+        cv2.circle(image, intersects[ind], 5, (255, 0, 0), -1)
 
-    for ind in range(0, len(midcols)):
-        cv2.circle(image, midcols[ind], 5, (255, 255, 0), -1)
+    # row_indices = []
+    # for y in row_starts.keys():
+    #     for x in row_starts[y]:
+    #         row_indices.append((x, y))
+    # for y in row_ends.keys():
+    #     for x in row_ends[y]:
+    #         row_indices.append((x, y))
+    #
+    # col_indices = []
+    # for x in col_starts.keys():
+    #     for y in col_starts[x]:
+    #         col_indices.append((x, y))
+    # for x in col_ends.keys():
+    #     for y in col_ends[x]:
+    #         col_indices.append((x, y))
+
+    # # http://docs.opencv.org/2.4/modules/core/doc/drawing_functions.html
+    # for ind in range(0, len(row_indices)):
+    #     cv2.circle(image, row_indices[ind], 10, (255, 0, 0), -1)
+    #
+    # for ind in range(0, len(col_indices)):
+    #     cv2.circle(image, col_indices[ind], 5, (255, 255, 0), -1)
+
+    # midrows = []
+    # # Compute midpoints of each edge, and save pixel indices as tuples
+    # for k in row_starts.keys():
+    #     for ind in range(0, len(row_starts[k])):
+    #         midpoint = int((row_ends[k][ind] + row_starts[k][ind]) / 2)
+    #         midrows.append((midpoint, k))
+    #
+    # midcols = []
+    # # Compute midpoints of each edge, and save pixel indices as tuples
+    # for k in col_starts.keys():
+    #     for ind in range(0, len(col_starts[k])):
+    #         midpoint = int((col_ends[k][ind] + col_starts[k][ind]) / 2)
+    #         midcols.append((k, midpoint))
+    #
+    # # http://docs.opencv.org/2.4/modules/core/doc/drawing_functions.html
+    # for ind in range(0, len(midrows)):
+    #     cv2.circle(image, midrows[ind], 5, (255, 0, 0), -1)
+    #
+    # for ind in range(0, len(midcols)):
+    #     cv2.circle(image, midcols[ind], 5, (255, 255, 0), -1)
 
     # show the images
     cv2.imshow("images", np.hstack([image]))
