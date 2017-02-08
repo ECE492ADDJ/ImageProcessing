@@ -1,3 +1,9 @@
+""""
+By:     Andrea McIntosh
+Date:   2017-02-08
+Function: Connect to webcam and take images
+""""
+
 # John Montgomery, http://stackoverflow.com/questions/604749/how-do-i-access-my-webcam-in-python, 2017-02-08
 import cv2
 
