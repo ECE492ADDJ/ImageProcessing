@@ -39,6 +39,7 @@ def getImage(filename):
 
     end_mask = cv2.inRange(image, red_lower, red_upper) # find red area (endzone)
     # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
+    end_X, end_Y = findRegionCenter(end_mask)
     image[np.where(end_mask == [255])] = 255 # white out red endzone
 
     ball_mask = cv2.inRange(image, green_lower, green_upper) # find green area (ball)
@@ -52,6 +53,28 @@ def getImage(filename):
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     return image, gray_image, x_div_len, y_div_len
+
+def findRegionCenter(image):
+    blurred = cv2.GaussianBlur(image, (5, 5), 0)
+    thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY)[1]
+
+    # find contours in the thresholded image
+    cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
+    	cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cnts[0]
+
+    # loop over the contours
+    for c in cnts:
+    	# compute the center of the contour
+    	M = cv2.moments(c)
+    	cX = int(M["m10"] / M["m00"])
+    	cY = int(M["m01"] / M["m00"])
+
+	cv2.circle(image, (cX, cY), 7, (50, 0, 255))
+
+    cv2.imshow("images", np.hstack([image]))
+    cv2.waitKey(0)
+    return cX, cY
 
 def findNodes(gray_image, x_div_len, y_div_len):
     # Run through all divisions
