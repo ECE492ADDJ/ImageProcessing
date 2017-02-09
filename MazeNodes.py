@@ -9,8 +9,8 @@ NUM_DIVS_Y = 20
 
 # define the list of colour ranges
 WHITE_THRESHOLD =  ([240, 240, 240], [255, 255, 255])
-RED_THRESHOLD =  ([0, 0, 100], [140, 140, 255])
-GREEN_THRESHOLD =  ([0, 75, 0], [200, 255, 200])
+RED_THRESHOLD =  ([0, 0, 150], [140, 140, 255])
+GREEN_THRESHOLD =  ([0, 150, 0], [160, 255, 160])
 
 nodes = {}
 
@@ -43,6 +43,7 @@ def getImage(filename):
     image[np.where(end_mask == [255])] = 255 # white out red endzone
 
     ball_mask = cv2.inRange(image, green_lower, green_upper) # find green area (ball)
+    ball_X, ball_Y = findRegionCenter(ball_mask)
     image[np.where(ball_mask == [255])] = 255 # white out green ball
 
     mask = cv2.inRange(image, white_lower, white_upper) # find white (playing) area
@@ -54,26 +55,18 @@ def getImage(filename):
 
     return image, gray_image, x_div_len, y_div_len
 
-def findRegionCenter(image):
-    blurred = cv2.GaussianBlur(image, (5, 5), 0)
-    thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY)[1]
+def findRegionCenter(mask):
+    # http://docs.opencv.org/3.1.0/dd/d49/tutorial_py_contour_features.html, 2017-02-08
+    ret,thresh = cv2.threshold(mask,127,255,0)
+    contours = cv2.findContours(thresh, 1, 2)
 
-    # find contours in the thresholded image
-    cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-    	cv2.CHAIN_APPROX_SIMPLE)
-    cnts = cnts[0]
+    cnt = contours[0]
+    M = cv2.moments(cnt)
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
 
-    # loop over the contours
-    for c in cnts:
-    	# compute the center of the contour
-    	M = cv2.moments(c)
-    	cX = int(M["m10"] / M["m00"])
-    	cY = int(M["m01"] / M["m00"])
+    cv2.circle(mask, (cX, cY), 10, (200, 0, 255), -1)
 
-	cv2.circle(image, (cX, cY), 7, (50, 0, 255))
-
-    cv2.imshow("images", np.hstack([image]))
-    cv2.waitKey(0)
     return cX, cY
 
 def findNodes(gray_image, x_div_len, y_div_len):
