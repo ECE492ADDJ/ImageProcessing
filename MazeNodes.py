@@ -4,13 +4,13 @@ import cv2
 from Node import *
 import sys
 
-SIG_LENGTH = 10
-
 NUM_DIVS_X = 30
 NUM_DIVS_Y = 20
 
 # define the list of colour ranges
 WHITE_THRESHOLD =  ([240, 240, 240], [255, 255, 255])
+RED_THRESHOLD =  ([0, 0, 100], [140, 140, 255])
+GREEN_THRESHOLD =  ([0, 75, 0], [200, 255, 200])
 
 nodes = {}
 
@@ -30,15 +30,26 @@ def getImage(filename):
 
     # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/, 2017-01-31
     # create NumPy arrays from the boundaries
-    lower = np.array(WHITE_THRESHOLD[0], dtype = "uint8")
-    upper = np.array(WHITE_THRESHOLD[1], dtype = "uint8")
+    red_lower = np.array(RED_THRESHOLD[0], dtype = "uint8")
+    red_upper = np.array(RED_THRESHOLD[1], dtype = "uint8")
+    green_lower = np.array(GREEN_THRESHOLD[0], dtype = "uint8")
+    green_upper = np.array(GREEN_THRESHOLD[1], dtype = "uint8")
+    white_lower = np.array(WHITE_THRESHOLD[0], dtype = "uint8")
+    white_upper = np.array(WHITE_THRESHOLD[1], dtype = "uint8")
 
-    mask = cv2.inRange(image, lower, upper)
-    output = cv2.bitwise_and(image, image, mask = mask)
+    end_mask = cv2.inRange(image, red_lower, red_upper) # find red area (endzone)
+    # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
+    image[np.where(end_mask == [255])] = 255 # white out red endzone
+
+    ball_mask = cv2.inRange(image, green_lower, green_upper) # find green area (ball)
+    image[np.where(ball_mask == [255])] = 255 # white out green ball
+
+    mask = cv2.inRange(image, white_lower, white_upper) # find white (playing) area
+    image[np.where(mask == [255])] = 255 # white out green ball
 
     # Convert mask output to greyscale
     # http://docs.opencv.org/3.2.0/df/d9d/tutorial_py_colorspaces.html, 2017-02-05
-    gray_image = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     return image, gray_image, x_div_len, y_div_len
 
@@ -96,5 +107,6 @@ def drawResults(image):
     cv2.waitKey(0)
 
 if __name__ == '__main__':
+    # http://www.diveintopython.net/scripts_and_streams/command_line_arguments.html, 2017-02-08
     image_name = sys.argv[1]
     main(image_name)
