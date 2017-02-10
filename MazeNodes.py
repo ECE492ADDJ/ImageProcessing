@@ -13,6 +13,8 @@ RED_THRESHOLD =  ([0, 0, 150], [140, 140, 255])
 GREEN_THRESHOLD =  ([0, 150, 0], [160, 255, 160])
 
 nodes = {}
+end = Node()
+start = Node()
 
 def main(fn):
     image, gray_image, x_div_len, y_div_len = getImage(fn)
@@ -37,14 +39,22 @@ def getImage(filename):
     white_lower = np.array(WHITE_THRESHOLD[0], dtype = "uint8")
     white_upper = np.array(WHITE_THRESHOLD[1], dtype = "uint8")
 
-    end_mask = cv2.inRange(image, red_lower, red_upper) # find red area (endzone)
     # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
+    end_mask = cv2.inRange(image, red_lower, red_upper) # find red area (endzone)
     end_X, end_Y = findRegionCenter(end_mask)
+    end.coordinates = (end_X, end_Y)
+    end.neighbours = []
+    end.start = True
+    end.end = False
     image[np.where(end_mask == [255])] = 255 # white out red endzone
 
-    ball_mask = cv2.inRange(image, green_lower, green_upper) # find green area (ball)
-    ball_X, ball_Y = findRegionCenter(ball_mask)
-    image[np.where(ball_mask == [255])] = 255 # white out green ball
+    start_mask = cv2.inRange(image, green_lower, green_upper) # find green area (ball)
+    start_X, start_Y = findRegionCenter(start_mask)
+    start.coordinates = (start_X, start_Y)
+    start.neighbours = []
+    start.start = True
+    start.end = False
+    image[np.where(start_mask == [255])] = 255 # white out green ball
 
     mask = cv2.inRange(image, white_lower, white_upper) # find white (playing) area
     image[np.where(mask == [255])] = 255 # white out green ball
@@ -64,8 +74,6 @@ def findRegionCenter(mask):
     M = cv2.moments(cnt)
     cX = int(M["m10"] / M["m00"])
     cY = int(M["m01"] / M["m00"])
-
-    cv2.circle(mask, (cX, cY), 10, (200, 0, 255), -1)
 
     return cX, cY
 
@@ -109,6 +117,10 @@ def drawResults(image):
     # Draw nodes
     for n in nodes:
         cv2.circle(image, n, 5, (150, 150, 150), -1)
+
+    cv2.circle(image, start.coordinates, 10, (0, 220, 220), -1)
+    cv2.circle(image, end.coordinates, 10, (200, 10, 200), -1)
+
 
     # Draw edges
     for n in nodes:
