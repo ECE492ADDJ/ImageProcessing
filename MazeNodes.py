@@ -4,8 +4,8 @@ import cv2
 from Node import *
 import sys
 
-NUM_DIVS_X = 30
-NUM_DIVS_Y = 20
+NUM_DIVS_X = 75
+NUM_DIVS_Y = 75
 
 # define the list of colour ranges
 WHITE_THRESHOLD =  ([240, 240, 240], [255, 255, 255])
@@ -39,6 +39,7 @@ def getImage(filename):
     white_lower = np.array(WHITE_THRESHOLD[0], dtype = "uint8")
     white_upper = np.array(WHITE_THRESHOLD[1], dtype = "uint8")
 
+    # Find ball and endzone:
     # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
     end_mask = cv2.inRange(image, red_lower, red_upper) # find red area (endzone)
     end_X, end_Y = findRegionCenter(end_mask)
@@ -57,7 +58,8 @@ def getImage(filename):
     image[np.where(start_mask == [255])] = 255 # white out green ball
 
     mask = cv2.inRange(image, white_lower, white_upper) # find white (playing) area
-    image[np.where(mask == [255])] = 255 # white out green ball
+    image[np.where(mask == [255])] = 255 # white out white
+    image[np.where(mask != [255])] = 0 # white out white
 
     # Convert mask output to greyscale
     # http://docs.opencv.org/3.2.0/df/d9d/tutorial_py_colorspaces.html, 2017-02-05
@@ -99,28 +101,24 @@ def findEdges(x_div_len, y_div_len):
         x = nc[0]
         y = nc[1]
         nc_neighbours = nodes.get(nc).neighbours
-
         # Check for adjacent nodes in all directions
         if (x - x_div_len, y) in nodes:
             nc_neighbours.append(nodes.get((x - x_div_len, y)))
-
         if (x + x_div_len, y) in nodes:
             nc_neighbours.append(nodes.get((x + x_div_len, y)))
-
         if (x, y - y_div_len) in nodes:
             nc_neighbours.append(nodes.get((x, y - y_div_len)))
-
         if (x, y + y_div_len) in nodes:
             nc_neighbours.append(nodes.get((x, y + y_div_len)))
 
 def drawResults(image):
     # Draw nodes
     for n in nodes:
-        cv2.circle(image, n, 5, (150, 150, 150), -1)
+        cv2.circle(image, n, 3, (150, 150, 150), -1)
 
-    cv2.circle(image, start.coordinates, 10, (0, 220, 220), -1)
-    cv2.circle(image, end.coordinates, 10, (200, 10, 200), -1)
-
+    # cv2.circle(image, start.coordinates, 10, (0, 220, 220), -1)
+    # cv2.circle(image, end.coordinates, 10, (200, 10, 200), -1)
+    #
 
     # Draw edges
     for n in nodes:
@@ -128,11 +126,13 @@ def drawResults(image):
             print 'Too many neighbours!!'
         for nb in nodes.get(n).neighbours:
             cv2.line(image, n, nb.coordinates, (nb.coordinates[0] % 255,
-                nb.coordinates[1] % 255, (nb.coordinates[0] + nb.coordinates[1]) % 255), 3)
+                nb.coordinates[1] % 255, (nb.coordinates[0] + nb.coordinates[1]) % 255), 2)
 
     # show the images
     cv2.imshow("images", np.hstack([image]))
     cv2.waitKey(0)
+
+    cv2.imwrite("test_maze_noded.png", image)
 
 if __name__ == '__main__':
     # http://www.diveintopython.net/scripts_and_streams/command_line_arguments.html, 2017-02-08
