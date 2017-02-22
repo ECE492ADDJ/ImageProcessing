@@ -46,8 +46,8 @@ def getImage(filename):
     end_X, end_Y = findRegionCenter(end_mask)
     end.coordinates = (end_X, end_Y)
     end.neighbours = []
-    end.start = True
-    end.end = False
+    end.start = False
+    end.end = True
     image[np.where(end_mask == [255])] = 255 # white out red endzone
     nodes[end.coordinates] = end
 
