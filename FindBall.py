@@ -1,10 +1,10 @@
 import numpy as np
-import cv2
+import cv2, sys
 from ImageProcessingFunctions import *
 
 GREEN_THRESHOLD =  ([0, 150, 0], [160, 255, 160])
 
-def getImage(filename):
+def findBall(filename):
     # load the image
     image = cv2.imread(filename)
 
@@ -18,4 +18,9 @@ def getImage(filename):
     start_mask = cv2.inRange(image, green_lower, green_upper) # find green area (ball)
     start_X, start_Y = findRegionCenter(start_mask)
 
-    return image, gray_image, x_div_len, y_div_len
+    print start_X, start_Y
+
+if __name__ == '__main__':
+    # http://www.diveintopython.net/scripts_and_streams/command_line_arguments.html, 2017-02-08
+    image_name = sys.argv[1]
+    findBall(image_name)

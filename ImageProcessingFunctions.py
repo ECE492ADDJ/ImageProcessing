@@ -12,3 +12,13 @@ def findRegionCenter(mask):
     cY = int(M["m01"] / M["m00"])
 
     return cX, cY
+
+def findRegionCenterNeighbours(rc_node, nodes, x_div_len, y_div_len):
+    x = rc_node.coordinates[0]
+    y = rc_node.coordinates[1]
+    rc_node.neighbours = []
+    # Check for adjacent nodes in all directions
+    for nx in range(x - x_div_len, x + x_div_len + 1):
+        for ny in range(y - y_div_len, y + y_div_len + 1):
+            if ((nx, ny) != (x, y)) and ((nx, ny) in nodes):
+                rc_node.neighbours.append(nodes.get((nx, ny)))

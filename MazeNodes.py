@@ -5,8 +5,8 @@ from Node import *
 import sys
 from ImageProcessingFunctions import *
 
-NUM_DIVS_X = 75
-NUM_DIVS_Y = 75
+NUM_DIVS_X = 25
+NUM_DIVS_Y = 25
 
 # define the list of colour ranges
 WHITE_THRESHOLD =  ([240, 240, 240], [255, 255, 255])
@@ -21,6 +21,8 @@ def main(fn):
     image, gray_image, x_div_len, y_div_len = getImage(fn)
     findNodes(gray_image, x_div_len, y_div_len)
     findEdges(x_div_len, y_div_len)
+    findRegionCenterNeighbours(start, nodes, x_div_len, y_div_len)
+    findRegionCenterNeighbours(end, nodes, x_div_len, y_div_len)
     drawResults(image)
 
 def getImage(filename):
