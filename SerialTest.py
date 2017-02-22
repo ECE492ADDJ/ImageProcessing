@@ -19,22 +19,12 @@ def stringTo16Bit(string):
 
 
 def testsend(port, command, expected):
-	with serial.Serial(port, 57600, timeout=1) as ser:
+	with serial.Serial(port, 57600, timeout=0.05) as ser:
 		t = time.time() * 1000
 
 		ser.write(command)
 
-		resp = ""
-		while True:
-			c = ser.read()
-			
-			if c == "":
-				break
-			elif c == '>':
-				resp += c
-				break
-			else:
-				resp += c
+		resp = ser.read_until(">")
 
 		elapsed = time.time() * 1000 - t
 
@@ -45,7 +35,7 @@ def testsend(port, command, expected):
 
 
 if __name__ == '__main__':
-	port = '/dev/ttyS1'
+	port = '/dev/ttyS0'
 
 	resp = raw_input("Type \"noservo\" to confirm that servos are not connected to the DE2: ")
 
