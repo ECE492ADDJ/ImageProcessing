@@ -19,7 +19,7 @@ def stringTo16Bit(string):
 
 
 def testsend(port, command, expected):
-	with serial.Serial(port, 115200, timeout=1) as ser:
+	with serial.Serial(port, 57600, timeout=1) as ser:
 		t = time.time() * 1000
 
 		ser.write(command)
@@ -45,7 +45,7 @@ def testsend(port, command, expected):
 
 
 if __name__ == '__main__':
-	port = '/dev/ttyS0'
+	port = '/dev/ttyS1'
 
 	resp = raw_input("Type \"noservo\" to confirm that servos are not connected to the DE2: ")
 
@@ -53,49 +53,49 @@ if __name__ == '__main__':
 		print "Servos connected, exiting"
 		sys.exit()
 
-	testsend(port, '<PING>', '<ACK>')
+	testsend(port, '<PG>', '<ACK>')
 
 	print "65535 - 65535"
-	testsend(port, '<SETX{0}>'.format(bit16ToString(65535)), '<ACK>')
-	testsend(port, '<SETY{0}>'.format(bit16ToString(65535)), '<ACK>')
-	testsend(port, '<GETX>', '<GETX{0}>'.format(bit16ToString(65535)))
-	testsend(port, '<GETY>', '<GETY{0}>'.format(bit16ToString(65535)))
+	testsend(port, '<SX%04x>' % 65535, '<ACK>')
+	testsend(port, '<SY%04x>' % 65535, '<ACK>')
+	testsend(port, '<GX>', '<GX%04x>' % 65535)
+	testsend(port, '<GY>', '<GY%04x>' % 65535)
 
 	print "30000 - 30000"
-	testsend(port, '<SETX{0}>'.format(bit16ToString(30000)), '<ACK>')
-	testsend(port, '<SETY{0}>'.format(bit16ToString(30000)), '<ACK>')
-	testsend(port, '<GETX>', '<GETX{0}>'.format(bit16ToString(30000)))
-	testsend(port, '<GETY>', '<GETY{0}>'.format(bit16ToString(30000)))
+	testsend(port, '<SX%04x>' % 30000, '<ACK>')
+	testsend(port, '<SY%04x>' % 30000, '<ACK>')
+	testsend(port, '<GX>', '<GX%04x>' % 30000)
+	testsend(port, '<GY>', '<GY%04x>' % 30000)
 
 	print "1 - 1"
-	testsend(port, '<SETX{0}>'.format(bit16ToString(1)), '<ACK>')
-	testsend(port, '<SETY{0}>'.format(bit16ToString(1)), '<ACK>')
-	testsend(port, '<GETX>', '<GETX{0}>'.format(bit16ToString(1)))
-	testsend(port, '<GETY>', '<GETY{0}>'.format(bit16ToString(1)))
+	testsend(port, '<SX%04x>' % 1, '<ACK>')
+	testsend(port, '<SY%04x>' % 1, '<ACK>')
+	testsend(port, '<GX>', '<GX%04x>' % 1)
+	testsend(port, '<GY>', '<GY%04x>' % 1)
 
 	print "65534 - 65534"
-	testsend(port, '<SETX{0}>'.format(bit16ToString(65534)), '<ACK>')
-	testsend(port, '<SETY{0}>'.format(bit16ToString(65534)), '<ACK>')
-	testsend(port, '<GETX>', '<GETX{0}>'.format(bit16ToString(65534)))
-	testsend(port, '<GETY>', '<GETY{0}>'.format(bit16ToString(65534)))
+	testsend(port, '<SX%04x>' % 65534, '<ACK>')
+	testsend(port, '<SY%04x>' % 65534, '<ACK>')
+	testsend(port, '<GX>', '<GX%04x>' % 65534)
+	testsend(port, '<GY>', '<GY%04x>' % 65534)
 
 	print "65535 - 30000"
-	testsend(port, '<SETX{0}>'.format(bit16ToString(65535)), '<ACK>')
-	testsend(port, '<SETY{0}>'.format(bit16ToString(30000)), '<ACK>')
-	testsend(port, '<GETX>', '<GETX{0}>'.format(bit16ToString(65535)))
-	testsend(port, '<GETY>', '<GETY{0}>'.format(bit16ToString(30000)))
+	testsend(port, '<SX%04x>' % 65535, '<ACK>')
+	testsend(port, '<SY%04x>' % 30000, '<ACK>')
+	testsend(port, '<GX>', '<GX%04x>' % 65535)
+	testsend(port, '<GY>', '<GY%04x>' % 30000)
 
 	print "30000 - 1"
-	testsend(port, '<SETX{0}>'.format(bit16ToString(30000)), '<ACK>')
-	testsend(port, '<SETY{0}>'.format(bit16ToString(1)), '<ACK>')
-	testsend(port, '<GETX>', '<GETX{0}>'.format(bit16ToString(30000)))
-	testsend(port, '<GETY>', '<GETY{0}>'.format(bit16ToString(1)))
+	testsend(port, '<SX%04x>' % 30000, '<ACK>')
+	testsend(port, '<SY%04x>' % 1, '<ACK>')
+	testsend(port, '<GX>', '<GX%04x>' % 30000)
+	testsend(port, '<GY>', '<GY%04x>' % 1)
 
 	print "1 - 65534"
-	testsend(port, '<SETX{0}>'.format(bit16ToString(1)), '<ACK>')
-	testsend(port, '<SETY{0}>'.format(bit16ToString(65534)), '<ACK>')
-	testsend(port, '<GETX>', '<GETX{0}>'.format(bit16ToString(1)))
-	testsend(port, '<GETY>', '<GETY{0}>'.format(bit16ToString(65534)))
+	testsend(port, '<SX%04x>' % 1, '<ACK>')
+	testsend(port, '<SY%04x>' % 65534, '<ACK>')
+	testsend(port, '<GX>', '<GX%04x>' % 1)
+	testsend(port, '<GY>', '<GY%04x>' % 65534)
 
 	testsend(port, '<nope>', '<NACK>')
 	testsend(port, '<uh oh', '')
