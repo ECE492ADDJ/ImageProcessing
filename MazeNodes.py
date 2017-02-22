@@ -49,6 +49,7 @@ def getImage(filename):
     end.start = True
     end.end = False
     image[np.where(end_mask == [255])] = 255 # white out red endzone
+    nodes[end.coordinates] = end
 
     start_mask = cv2.inRange(image, green_lower, green_upper) # find green area (ball)
     start_X, start_Y = findRegionCenter(start_mask)
@@ -57,6 +58,7 @@ def getImage(filename):
     start.start = True
     start.end = False
     image[np.where(start_mask == [255])] = 255 # white out green ball
+    nodes[start.coordinates] = start
 
     mask = cv2.inRange(image, white_lower, white_upper) # find white (playing) area
     image[np.where(mask == [255])] = 255 # white out white
