@@ -1,117 +1,92 @@
 #!/usr/bin/python
+import sys
 from Node import *
+import MazeNodes
+from ImageProcessingFunctions import *
+from collections import deque
 
-class Dijkstras:
-	'Find the shortest path between two nodes retrieved from image'
+def main(fn):
+    image, gray_image, x_div_len, y_div_len = MazeNodes.getImage(fn)
+    MazeNodes.findNodes(gray_image, x_div_len, y_div_len)
+    MazeNodes.findEdges(x_div_len, y_div_len)
 
-	def __init__(self, nodeList):
-		'Requires only the full list of nodes. Will find the start and endpoint, then find a path between them.'
-		self.unvisitedNodes = nodeList
-		self.path = []
-		print("Initialized")
+    nodes = MazeNodes.nodes
 
-	def findPoints(self):
-		'Iterates through the list of nodes to find start and end points'
-		for node in self.unvisitedNodes:
-			if(node.start):
-				self.startNode = node
-			elif(node.end):
-				self.endNode = node
+    startNode = Node()
+    endNode = Node()
 
-	def startPath(self):
-		'Starts recursive search through nodes'
-		print("Starting Path!")
-		self.unvisitedNodes.remove(self.startNode)
-		currPath = [self.startNode]
-		for node in self.startNode.neighbours:
-			self.unvisitedNodes.remove(node)
-			self.findPath(node, currPath)
+    for j in nodes:
+	if nodes.get(j).start:
+		startNode = nodes.get(j)
+	if nodes.get(j).end:
+		endNode = nodes.get(j)
 
+    findRegionCenterNeighbours(startNode, nodes, x_div_len, y_div_len)
+    findRegionCenterNeighbours(endNode, nodes, x_div_len, y_div_len)
 
-	def findPath(self, currNode, currPath):
-		'Recursively search through nodes looking for end point'
-		print("Finding path!")
-		print(len(currPath))
-		currPath.append(currNode)
-		if(currNode == self.endNode):
-			print("At end!")
-			self.path = currPath
-			return
-			
-		for node in currNode.neighbours:
-			if node in self.unvisitedNodes:
+    # Creating a fully undirected graph. Hardcoded madness, we will have to change how we find regioncenterneighbours
+    for n in nodes:
+    	if n == (47, 25):
+    		nodes.get(n).neighbours.append(startNode)
 
-				self.unvisitedNodes.remove(node)
-				self.findPath(node,currPath)
+    	if n == (66, 25):
+    		nodes.get(n).neighbours.append(startNode)
 
-		# If the full path has not been found by in this branch, remove the branch from path
-		if len(self.path) is 0:
-				currPath.remove(currNode)
-		
+    	if n == (47, 42):
+    		nodes.get(n).neighbours.append(startNode)
 
+    	if n == (66, 42):
+    		nodes.get(n).neighbours.append(startNode)
 
+    	if n == (503, 25):
+    		nodes.get(n).neighbours.append(endNode)
 
+    	if n == (522, 25):
+    		nodes.get(n).neighbours.append(endNode)
 
-A = Node()
-A.coordinates = (0,1)
-A.start = True
-print(A.coordinates)
+    graph = {}
 
-B = Node()
-B.end = False
-B.coordinates = (0,2)
+    for n in nodes:
+        graph[nodes.get(n)] = nodes.get(n).neighbours
 
-C = Node()
-C.coordinates = (0,3)
+    path = shortest_path(graph, startNode, endNode)
 
-D = Node()
-D.coordinates = (0,4)
+    printnode = {}
+    for elem in path:
+        printnode[elem.coordinates] = elem
 
-E = Node()
-E.coordinates = (0,5)
-E.end = False
-
-F = Node()
-F.end = True
-F.coordinates = (0,6)
-
-G = Node()
-G.coordinates = (0,7)
-
-A.neighbours.append(B)
-A.neighbours.append(C)
-
-C.neighbours.append(A)
-C.neighbours.append(E)
-C.neighbours.append(F)
-
-F.neighbours.append(C)
-F.neighbours.append(G)
-
-G.neighbours.append(F)
-G.neighbours.append(E)
+    MazeNodes.drawResults(image, printnode)
 
 
-E.neighbours.append(C)
-E.neighbours.append(D)
-E.neighbours.append(G)
+#http://code.activestate.com/recipes/576675-bfs-breadth-first-search-graph-traversal/
+def bfs(g, start):
+    queue, enqueued = deque([(None, start)]), set([start])
+    while queue:
+        parent, n = queue.popleft()
+        yield parent, n
+        new = set(g[n]) - enqueued
+        enqueued |= new
+        queue.extend([(n, child) for child in new])
 
-D.neighbours.append(E)
+def shortest_path(g, start, end):
+    parents = {}
+    for parent, child in bfs(g, start):
+        parents[child] = parent
+        if child == end:
+            revpath = [end]
+            while True:
+                parent = parents[child]
+                revpath.append(parent)
+                if parent == start:
+                    break
+                child = parent
+            return list(reversed(revpath))
+    return None # or raise appropriate exception
 
-B.neighbours.append(A)
+# 	return path
 
-path = Dijkstras([A,B,C,D,E,F,G]);
-path.findPoints()
-path.startPath()
+if __name__ == '__main__':
+    # http://www.diveintopython.net/scripts_and_streams/command_line_arguments.html, 2017-02-08
+    image_name = sys.argv[1]
+    main(image_name)
 
-print("Start and end points:")
-print(path.startNode.coordinates);
-print(path.endNode.coordinates);
-
-print("neighbours of start:")
-for element in A.neighbours:
-	print(element.coordinates)
-
-print("path:")	
-for node in path.path:
-	print(node.coordinates)
