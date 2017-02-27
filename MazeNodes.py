@@ -19,9 +19,9 @@ NUM_DIVS_X = 25
 NUM_DIVS_Y = 25
 
 # define the list of colour ranges
-WHITE_THRESHOLD =  ([240, 240, 240], [255, 255, 255])
-RED_THRESHOLD =  ([0, 0, 150], [140, 140, 255])
-GREEN_THRESHOLD =  ([0, 150, 0], [160, 255, 160])
+PLAY_THRESHOLD =  ([240, 240, 240], [255, 255, 255])
+END_THRESHOLD =  ([0, 0, 150], [140, 140, 255])
+START_THRESHOLD =  ([0, 150, 0], [160, 255, 160])
 
 
 class MazeNodes:
@@ -36,12 +36,12 @@ class MazeNodes:
 
         # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/, 2017-01-31
         # Create thresholds for colour detection
-        self.red_lower = np.array(RED_THRESHOLD[0], dtype = "uint8")
-        self.red_upper = np.array(RED_THRESHOLD[1], dtype = "uint8")
-        self.green_lower = np.array(GREEN_THRESHOLD[0], dtype = "uint8")
-        self.green_upper = np.array(GREEN_THRESHOLD[1], dtype = "uint8")
-        self.white_lower = np.array(WHITE_THRESHOLD[0], dtype = "uint8")
-        self.white_upper = np.array(WHITE_THRESHOLD[1], dtype = "uint8")
+        self.end_lower = np.array(END_THRESHOLD[0], dtype = "uint8")
+        self.end_upper = np.array(END_THRESHOLD[1], dtype = "uint8")
+        self.start_lower = np.array(START_THRESHOLD[0], dtype = "uint8")
+        self.start_upper = np.array(START_THRESHOLD[1], dtype = "uint8")
+        self.play_lower = np.array(PLAY_THRESHOLD[0], dtype = "uint8")
+        self.play_upper = np.array(PLAY_THRESHOLD[1], dtype = "uint8")
 
         # Find pixel length of each grid div
         self.x_div_len = int(len(image[0]) / NUM_DIVS_X) # floors number of divisions in width
@@ -57,16 +57,16 @@ class MazeNodes:
     def preProcessImage(self):
         # Find endone and white it out
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
-        end_mask = cv2.inRange(self.image, self.red_lower, self.red_upper) # find red area (endzone)
+        end_mask = cv2.inRange(self.image, self.end_lower, self.end_upper) # find red area (endzone)
         self.findEnd(end_mask)
         self.image[np.where(end_mask == [255])] = 255 # white out endzone
 
         # Find start (ball) and white it out
-        start_mask = cv2.inRange(self.image, self.green_lower, self.green_upper) # find green area (ball)
+        start_mask = cv2.inRange(self.image, self.start_lower, self.start_upper) # find green area (ball)
         self.findStart(start_mask)
         self.image[np.where(start_mask == [255])] = 255 # white out ball
 
-        mask = cv2.inRange(self.image, self.white_lower, self.white_upper) # find white (playing) area
+        mask = cv2.inRange(self.image, self.play_lower, self.play_upper) # find white (playing) area
         self.image[np.where(mask == [255])] = 255 # white out white
         self.image[np.where(mask != [255])] = 0 # white out white
 
@@ -133,8 +133,8 @@ class MazeNodes:
         for n in self.nodes:
             cv2.circle(self.image, n, 3, (150, 150, 150), -1)
 
-        cv2.circle(image, self.start.coordinates, 10, (0, 220, 220), -1)
-        cv2.circle(image, self.end.coordinates, 10, (200, 10, 200), -1)
+        cv2.circle(self.image, self.start.coordinates, 10, (0, 220, 220), -1)
+        cv2.circle(self.image, self.end.coordinates, 10, (200, 10, 200), -1)
 
         # Draw edges
         for n in self.nodes:
