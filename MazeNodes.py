@@ -1,3 +1,14 @@
+"""
+Filename:       MazeNodes.py
+File type:      server-side python code
+Author:         Andrea McIntosh
+Created on:     2017-01-31
+Modified on:    2017-02-26
+Description:    Class that converts image of maze to a graph of nodes and edges
+                for pathfinding.  Nodes are found by spliting the image into a
+                grid and detecting colour regions.
+"""
+
 # import the necessary packages
 import numpy as np
 import cv2

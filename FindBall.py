@@ -1,3 +1,12 @@
+"""
+Filename:       FindBall.py
+File type:      server-side python code
+Author:         Andrea McIntosh
+Created on:     2017-02-21
+Modified on:    2017-02-26
+Description:    Use video frames to continuously detect the location of the ball
+"""
+
 import numpy as np
 import cv2, sys
 from ImageProcessingFunctions import *

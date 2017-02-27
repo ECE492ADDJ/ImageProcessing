@@ -1,6 +1,14 @@
+"""
+Filename:       ImageProcessingFunctions.py
+File type:      server-side python code
+Author:         Andrea McIntosh
+Created on:     2017-02-21
+Modified on:    2017-02-26
+Description:    Functions for connecting to the usb webcam and capturing images
+"""
+
 import numpy as np
 import cv2
-
 
 def getImage(filename):
     # load the image
