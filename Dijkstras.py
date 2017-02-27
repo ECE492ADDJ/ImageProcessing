@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import sys
 from Node import *
-import MazeNodes
+from MazeNodes import MazeNodes
 from ImageProcessingFunctions import *
 from collections import deque
 
@@ -22,41 +22,41 @@ def main():
 	if nodes.get(j).end:
 		endNode = nodes.get(j)
 
-    findRegionCenterNeighbours(startNode, nodes, x_div_len, y_div_len)
-    findRegionCenterNeighbours(endNode, nodes, x_div_len, y_div_len)
+    findRegionCenterNeighbours(startNode, nodes, mn.x_div_len, mn.y_div_len)
+    findRegionCenterNeighbours(endNode, nodes, mn.x_div_len, mn.y_div_len)
 
-    # Creating a fully undirected graph. Hardcoded madness, we will have to change how we find regioncenterneighbours
-    for n in nodes:
-    	if n == (47, 25):
-    		nodes.get(n).neighbours.append(startNode)
-
-    	if n == (66, 25):
-    		nodes.get(n).neighbours.append(startNode)
-
-    	if n == (47, 42):
-    		nodes.get(n).neighbours.append(startNode)
-
-    	if n == (66, 42):
-    		nodes.get(n).neighbours.append(startNode)
-
-    	if n == (503, 25):
-    		nodes.get(n).neighbours.append(endNode)
-
-    	if n == (522, 25):
-    		nodes.get(n).neighbours.append(endNode)
-
+    # # Creating a fully undirected graph. Hardcoded madness, we will have to change how we find regioncenterneighbours
+    # for n in nodes:
+    # 	if n == (47, 25):
+    # 		nodes.get(n).neighbours.append(startNode)
+    #
+    # 	if n == (66, 25):
+    # 		nodes.get(n).neighbours.append(startNode)
+    #
+    # 	if n == (47, 42):
+    # 		nodes.get(n).neighbours.append(startNode)
+    #
+    # 	if n == (66, 42):
+    # 		nodes.get(n).neighbours.append(startNode)
+    #
+    # 	if n == (503, 25):
+    # 		nodes.get(n).neighbours.append(endNode)
+    #
+    # 	if n == (522, 25):
+    # 		nodes.get(n).neighbours.append(endNode)
+    #
     graph = {}
 
     for n in nodes:
         graph[nodes.get(n)] = nodes.get(n).neighbours
-
+    #
     path = shortest_path(graph, startNode, endNode)
+    #
+    # printnode = {}
+    # for elem in path:
+    #     printnode[elem.coordinates] = elem
 
-    printnode = {}
-    for elem in path:
-        printnode[elem.coordinates] = elem
-
-    ImageProcessingFunctions.drawResults(image, nodes, printnode)
+    drawResults(image, nodes, path)
 
 
 #http://code.activestate.com/recipes/576675-bfs-breadth-first-search-graph-traversal/
@@ -88,5 +88,5 @@ def shortest_path(g, start, end):
 
 if __name__ == '__main__':
     # http://www.diveintopython.net/scripts_and_streams/command_line_arguments.html, 2017-02-08
-    image_name = sys.argv[1]
-
+    # image_name = sys.argv[1]
+    main()
