@@ -4,7 +4,9 @@ File type:      server-side python code
 Author:         Andrea McIntosh
 Created on:     2017-02-21
 Modified on:    2017-02-26
-Description:    Functions for connecting to the usb webcam and capturing images
+Description:    Utility functions for image processing.  Functions that are
+                required by both MazeNodes.py and FindBall.py are saved here to
+                avoid redundancy.
 """
 
 import numpy as np
@@ -17,6 +19,7 @@ def getImage(filename):
     return image
 
 def findRegionCenter(mask):
+    # Use OpenCV to find the center of a colour region
     # http://docs.opencv.org/3.1.0/dd/d49/tutorial_py_contour_features.html, 2017-02-08
     ret,thresh = cv2.threshold(mask,127,255,0)
     contours = cv2.findContours(thresh, 1, 2)
@@ -29,6 +32,8 @@ def findRegionCenter(mask):
     return cX, cY
 
 def findRegionCenterNeighbours(rc_node, nodes, x_div_len, y_div_len):
+    """ Find neighbours to a node that does not necessarily fall on the grid (i.e.
+        the start and end nodes) """
     x = rc_node.coordinates[0]
     y = rc_node.coordinates[1]
     rc_node.neighbours = []

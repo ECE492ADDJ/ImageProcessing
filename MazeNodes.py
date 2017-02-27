@@ -55,15 +55,16 @@ class MazeNodes:
         self.drawResults()
 
     def preProcessImage(self):
-        # Find ball and endzone:
+        # Find endone and white it out
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
         end_mask = cv2.inRange(self.image, self.red_lower, self.red_upper) # find red area (endzone)
         self.findEnd(end_mask)
-        self.image[np.where(end_mask == [255])] = 255 # white out red endzone
+        self.image[np.where(end_mask == [255])] = 255 # white out endzone
 
+        # Find start (ball) and white it out
         start_mask = cv2.inRange(self.image, self.green_lower, self.green_upper) # find green area (ball)
         self.findStart(start_mask)
-        self.image[np.where(start_mask == [255])] = 255 # white out green ball
+        self.image[np.where(start_mask == [255])] = 255 # white out ball
 
         mask = cv2.inRange(self.image, self.white_lower, self.white_upper) # find white (playing) area
         self.image[np.where(mask == [255])] = 255 # white out white
@@ -94,6 +95,7 @@ class MazeNodes:
         self.nodes[self.end.coordinates] = self.end
 
     def findNodes(self, gray_image):
+        """ Find all valid nodes """
         # Run through all divisions
         for div_x in range(0, NUM_DIVS_X):
             for div_y in range(0, NUM_DIVS_Y):
@@ -110,7 +112,8 @@ class MazeNodes:
                     self.nodes[n.coordinates] = n
 
     def findEdges(self):
-        # Create edges
+        """ Find all edges between nodes.  Edges only connect immediately adjacent
+            nodes in straight (not diagonal) lines """
         for nc in self.nodes:
             x = nc[0]
             y = nc[1]
@@ -130,9 +133,8 @@ class MazeNodes:
         for n in self.nodes:
             cv2.circle(self.image, n, 3, (150, 150, 150), -1)
 
-        # cv2.circle(image, self.start.coordinates, 10, (0, 220, 220), -1)
-        # cv2.circle(image, self.end.coordinates, 10, (200, 10, 200), -1)
-        #
+        cv2.circle(image, self.start.coordinates, 10, (0, 220, 220), -1)
+        cv2.circle(image, self.end.coordinates, 10, (200, 10, 200), -1)
 
         # Draw edges
         for n in self.nodes:
