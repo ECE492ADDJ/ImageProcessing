@@ -52,7 +52,7 @@ class MazeNodes:
         gray_image = self.preProcessImage()
         self.findNodes(gray_image)
         self.findEdges()
-        self.drawResults()
+        drawResults()
 
     def preProcessImage(self):
         # Find endone and white it out
@@ -127,25 +127,3 @@ class MazeNodes:
                 nc_neighbours.append(self.nodes.get((x, y - self.y_div_len)))
             if (x, y + self.y_div_len) in self.nodes:
                 nc_neighbours.append(self.nodes.get((x, y + self.y_div_len)))
-
-    def drawResults(self):
-        # Draw nodes
-        for n in self.nodes:
-            cv2.circle(self.image, n, 3, (150, 150, 150), -1)
-
-        cv2.circle(self.image, self.start.coordinates, 10, (0, 220, 220), -1)
-        cv2.circle(self.image, self.end.coordinates, 10, (200, 10, 200), -1)
-
-        # Draw edges
-        for n in self.nodes:
-            if len(self.nodes.get(n).neighbours) > 4:
-                print 'Too many neighbours!!'
-            for nb in self.nodes.get(n).neighbours:
-                cv2.line(self.image, n, nb.coordinates, (nb.coordinates[0] % 255,
-                    nb.coordinates[1] % 255, (nb.coordinates[0] + nb.coordinates[1]) % 255), 2)
-
-        # show the images
-        cv2.imshow("images", np.hstack([self.image]))
-        cv2.waitKey(0)
-
-        cv2.imwrite("test_maze_noded.png", self.image)

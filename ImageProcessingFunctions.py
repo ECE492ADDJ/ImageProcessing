@@ -18,6 +18,33 @@ def getImage(filename):
 
     return image
 
+def drawResults(image, all_nodes, path_nodes):
+    # Draw nodes
+    for n in all_nodes:
+        cv2.circle(image, n, 3, (150, 150, 150), -1)
+
+    cv2.circle(image, self.start.coordinates, 10, (0, 220, 220), -1)
+    cv2.circle(image, self.end.coordinates, 10, (200, 10, 200), -1)
+
+    # # Draw edges
+    # for n in all_nodes:
+    #     if len(all_nodes.get(n).neighbours) > 4:
+    #         print 'Too many neighbours!!'
+    #     for nb in all_nodes.get(n).neighbours:
+    #         cv2.line(image, n, nb.coordinates, (nb.coordinates[0] % 255,
+    #             nb.coordinates[1] % 255, (nb.coordinates[0] + nb.coordinates[1]) % 255), 2)
+
+    # Draw path
+    for n in range(0, len(path_nodes) - 1):
+        cv2.line(image, path_nodes[n].coordinates, path_nodes[n + 1].coordinates, (255, 100, 0), 2)
+
+    # show the images
+    cv2.imshow("images", np.hstack([image]))
+    cv2.waitKey(0)
+
+    # cv2.imwrite("test_maze_noded.png", image)
+
+
 def findRegionCenter(mask):
     # Use OpenCV to find the center of a colour region
     # http://docs.opencv.org/3.1.0/dd/d49/tutorial_py_contour_features.html, 2017-02-08
