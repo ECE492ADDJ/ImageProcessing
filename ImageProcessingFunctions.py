@@ -69,3 +69,4 @@ def findRegionCenterNeighbours(rc_node, nodes, x_div_len, y_div_len):
         for ny in range(y - y_div_len, y + y_div_len + 1):
             if ((nx, ny) != (x, y)) and ((nx, ny) in nodes):
                 rc_node.neighbours.append(nodes.get((nx, ny)))
+                nodes.get((nx, ny)).neighbours.append(rc_node)
