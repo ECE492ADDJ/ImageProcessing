@@ -5,12 +5,13 @@ import MazeNodes
 from ImageProcessingFunctions import *
 from collections import deque
 
-def main(fn):
-    image, gray_image, x_div_len, y_div_len = MazeNodes.getImage(fn)
-    MazeNodes.findNodes(gray_image, x_div_len, y_div_len)
-    MazeNodes.findEdges(x_div_len, y_div_len)
+def main():
+    image = getImage('paintmaze_small.png')
 
-    nodes = MazeNodes.nodes
+    mn = MazeNodes(image)
+    mn.runProcessing()
+
+    nodes = mn.nodes
 
     startNode = Node()
     endNode = Node()
@@ -55,7 +56,7 @@ def main(fn):
     for elem in path:
         printnode[elem.coordinates] = elem
 
-    MazeNodes.drawResults(image, printnode)
+    ImageProcessingFunctions.drawResults(image, nodes, printnode)
 
 
 #http://code.activestate.com/recipes/576675-bfs-breadth-first-search-graph-traversal/
@@ -88,5 +89,4 @@ def shortest_path(g, start, end):
 if __name__ == '__main__':
     # http://www.diveintopython.net/scripts_and_streams/command_line_arguments.html, 2017-02-08
     image_name = sys.argv[1]
-    main(image_name)
 
