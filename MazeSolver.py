@@ -30,6 +30,8 @@ def main():
     pf = PathFinder(nodes, startNode, endNode)
     path = pf.findPath()
 
+    directions = pf.translate(path)
+
     drawResults(image, nodes, path)
 
 if __name__ == '__main__':

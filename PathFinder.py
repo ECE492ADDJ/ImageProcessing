@@ -58,3 +58,28 @@ class PathFinder:
                         break
                     child = parent
                 return list(reversed(revpath))
+
+    def translate(self, path):
+        """ Given an ordered list of nodes, translates the coordinates into directions """
+        directions = []
+
+        for p in range(len(path) - 1):
+            x1 = path[p].coordinates[0]
+            y1 = path[p].coordinates[1]
+            x2 = path[p + 1].coordinates[0]
+            y2 = path[p + 1].coordinates[1]
+
+            diffx = x1 - x2
+            diffy = y1 - y2
+
+            if (diffx == 0 and diffy < 0):
+                directions.append('Down')
+            if (diffx == 0 and diffy > 0):
+                directions.append('Up')
+            if (diffx < 0 and diffy == 0):
+                directions.append('Right')
+            if (diffx > 0 and diffy == 0):
+                directions.append('Left')
+
+        return directions
+
