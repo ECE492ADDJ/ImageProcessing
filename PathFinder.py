@@ -19,63 +19,42 @@ from collections import deque
 class PathFinder:
     """ Finds a path for any given graph generated via image processing """
 
-def main():
-    image = getImage('paintmaze_small.png')
+    def __init__(self, nodes, start, end):
+        self.nodes = nodes
+        self.startNode = start
+        self.endNode = end
 
-    mn = MazeNodes(image)
-    mn.runProcessing()
+    def findPath(self):
 
-    nodes = mn.nodes
+        graph = {}
 
-    startNode = Node()
-    endNode = Node()
+        for n in self.nodes:
+            graph[self.nodes.get(n)] = self.nodes.get(n).neighbours
+        
+        path = self.shortestPath(graph, self.startNode, self.endNode)
 
-    for j in nodes:
-	if nodes.get(j).start:
-		startNode = nodes.get(j)
-	if nodes.get(j).end:
-		endNode = nodes.get(j)
+        return path
 
-    findRegionCenterNeighbours(startNode, nodes, mn.x_div_len, mn.y_div_len)
-    findRegionCenterNeighbours(endNode, nodes, mn.x_div_len, mn.y_div_len)
+    #http://code.activestate.com/recipes/576675-bfs-breadth-first-search-graph-traversal/
+    def breadthFirstSearch(self, g, start):
+        queue, enqueued = deque([(None, start)]), set([start])
+        while queue:
+            parent, n = queue.popleft()
+            yield parent, n
+            new = set(g[n]) - enqueued
+            enqueued |= new
+            queue.extend([(n, child) for child in new])
 
-    graph = {}
-
-    for n in nodes:
-        graph[nodes.get(n)] = nodes.get(n).neighbours
-    
-    path = shortestPath(graph, startNode, endNode)
- 
-    drawResults(image, nodes, path)
-
-
-#http://code.activestate.com/recipes/576675-bfs-breadth-first-search-graph-traversal/
-def breadthFirstSearch(g, start):
-    queue, enqueued = deque([(None, start)]), set([start])
-    while queue:
-        parent, n = queue.popleft()
-        yield parent, n
-        new = set(g[n]) - enqueued
-        enqueued |= new
-        queue.extend([(n, child) for child in new])
-
-def shortestPath(g, start, end):
-    parents = {}
-    for parent, child in breadthFirstSearch(g, start):
-        parents[child] = parent
-        if child == end:
-            revpath = [end]
-            while True:
-                parent = parents[child]
-                revpath.append(parent)
-                if parent == start:
-                    break
-                child = parent
-            return list(reversed(revpath))
-    return None # or raise appropriate exception
-
-# 	return path
-
-if __name__ == '__main__':
-    # http://www.diveintopython.net/scripts_and_streams/command_line_arguments.html, 2017-02-08
-    main()
+    def shortestPath(self, g, start, end):
+        parents = {}
+        for parent, child in self.breadthFirstSearch(g, start):
+            parents[child] = parent
+            if child == end:
+                revpath = [end]
+                while True:
+                    parent = parents[child]
+                    revpath.append(parent)
+                    if parent == start:
+                        break
+                    child = parent
+                return list(reversed(revpath))

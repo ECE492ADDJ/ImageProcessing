@@ -1,36 +1,38 @@
 # import the necessary packages
 import sys
 from Node import *
-import Dijkstras
-import MazeNodes
+from MazeNodes import MazeNodes
+from PathFinder import PathFinder
 from ImageProcessingFunctions import *
 
 
-def main(fn):
-    image, gray_image, x_div_len, y_div_len = MazeNodes.getImage(fn)
-    MazeNodes.findNodes(gray_image, x_div_len, y_div_len)
-    MazeNodes.findEdges(x_div_len, y_div_len)
-    nodes = MazeNodes.nodes
+def main():
+
+    image = getImage('paintmaze_small.png')
+
+    mn = MazeNodes(image)
+    mn.runProcessing()
+
+    nodes = mn.nodes
 
     startNode = Node()
     endNode = Node()
 
-    for j in nodes:
-        if nodes.get(j).start:
-            startNode = nodes.get(j)
-        if nodes.get(j).end:
-            endNode = nodes.get(j)
+    for n in nodes:
+	if nodes.get(n).start:
+		startNode = nodes.get(n)
+	if nodes.get(n).end:
+		endNode = nodes.get(n)
 
-    findRegionCenterNeighbours(startNode, nodes, x_div_len, y_div_len)
-    findRegionCenterNeighbours(endNode, nodes, x_div_len, y_div_len)
-    #Perform Dijkstras
+    findRegionCenterNeighbours(startNode, nodes, mn.x_div_len, mn.y_div_len)
+    findRegionCenterNeighbours(endNode, nodes, mn.x_div_len, mn.y_div_len)
 
+    pf = PathFinder(nodes, startNode, endNode)
+    path = pf.findPath()
 
-
-    MazeNodes.drawResults(image, nodes)
+    drawResults(image, nodes, path)
 
 if __name__ == '__main__':
     # http://www.diveintopython.net/scripts_and_streams/command_line_arguments.html, 2017-02-08
-    image_name = sys.argv[1]
-    main(image_name)
+    main()
  
