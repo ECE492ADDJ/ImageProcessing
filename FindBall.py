@@ -21,10 +21,18 @@ class FindBall:
         self.thresh_lower = start_lower
         self.thresh_upper = start_upper
 
+        self.ball_history = []
+
     def findBall(self, image):
-        # Find ball and endzone:
+        # Find ball:
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
         ball_mask = cv2.inRange(image, self.thresh_lower, self.thresh_upper) # find ball
-        ball_X, ball_Y = findRegionCenter(ball_mask)
+        ball_x, ball_y = findRegionCenter(ball_mask)
 
-        print ball_X, ball_Y
+        self.ball_history.append((ball_x, ball_y))
+
+        print ball_x, ball_y
+
+    def calcAcceleration():
+        if len(self.ball_history) > 3:
+            return

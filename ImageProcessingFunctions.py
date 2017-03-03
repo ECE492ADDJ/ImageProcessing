@@ -37,6 +37,7 @@ def drawResults(image, all_nodes, path_nodes):
 
     # Draw path
     for n in range(0, len(path_nodes) - 1):
+        cv2.circle(image, path_nodes[n].coordinates, 10, (0, 0, 255), -1)
         cv2.line(image, path_nodes[n].coordinates, path_nodes[n + 1].coordinates, (255, 200, 0), 2)
 
     # show the images

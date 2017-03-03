@@ -30,8 +30,10 @@ class PathFinder:
 
         for n in self.nodes:
             graph[self.nodes.get(n)] = self.nodes.get(n).neighbours
-        
+
         path = self.shortestPath(graph, self.startNode, self.endNode)
+
+        sp = self.reduceNodes(path)
 
         return path
 
@@ -83,3 +85,23 @@ class PathFinder:
 
         return directions
 
+    """ Remove redundant nodes (itermediate nodes in a straight line) from path """
+    def reduceNodes(self, path):
+        reduced_path = []
+        p = 0
+        reduced_path.append(path[p])
+
+        while p < (len(path) - 1):
+            if path[p].coordinates[0] == path[p + 1].coordinates[0]:
+                while path[p].coordinates[0] == path[p + 1].coordinates[0]:
+                    p += 1
+                reduced_path.append(path[p])
+            elif path[p].coordinates[1] == path[p + 1].coordinates[1]:
+                while path[p].coordinates[1] == path[p + 1].coordinates[1]:
+                    p += 1
+                reduced_path.append(path[p])
+            else:
+                reduced_path.append(path[p])
+            p += 1
+
+        return reduced_path
