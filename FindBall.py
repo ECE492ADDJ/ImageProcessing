@@ -5,6 +5,13 @@ Author:         Andrea McIntosh
 Created on:     2017-02-21
 Modified on:    2017-03-02
 Description:    Use video frames to continuously detect the location of the ball
+
+>>> fb = FindBall(5, 5, (0, 0, 0), (255, 255, 255))
+>>> fb.ball_history = [((1,1), 0), ((2,1), 1), ((4,1), 2)]
+>>> len(fb.ball_history)
+3
+>>> fb.calcAcceleration()
+(0.5, 0.0)
 """
 
 import numpy as np
@@ -36,13 +43,14 @@ class FindBall:
 
     def calcAcceleration(self):
         len_hist = len(self.ball_history)
-        if len_hist > 3:
+        if len_hist >= 3:
             vel_1_x, vel_1_y = self.calcVelocity(self.ball_history[len_hist - 3], self.ball_history[len_hist - 2])
             vel_2_x, vel_2_y = self.calcVelocity(self.ball_history[len_hist - 2], self.ball_history[len_hist - 1])
 
-            acc_x = (vel_2_x - vel_1_x) / (self.ball_history[len_hist - 1][1] - self.ball_history[len_hist - 3][1])
-            acc_y = (vel_2_y - vel_1_y) / (self.ball_history[len_hist - 1][1] - self.ball_history[len_hist - 3][1])
-            return
+            acc_x = float(vel_2_x - vel_1_x) / (self.ball_history[len_hist - 1][1] - self.ball_history[len_hist - 3][1])
+            acc_y = float(vel_2_y - vel_1_y) / (self.ball_history[len_hist - 1][1] - self.ball_history[len_hist - 3][1])
+            return acc_x, acc_y
+        return None
 
     # expects postions as tuples of ((x, y), time)
     def calcVelocity(self, start_pos, curr_pos):
@@ -50,3 +58,7 @@ class FindBall:
         vel_x = (curr_pos[0][0] - start_pos[0][0]) / (curr_pos[1] - start_pos[1])
         vel_y = (curr_pos[0][1] - start_pos[0][1]) / (curr_pos[1] - start_pos[1])
         return vel_x, vel_y
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
