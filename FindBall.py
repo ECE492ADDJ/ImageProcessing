@@ -12,6 +12,12 @@ Description:    Use video frames to continuously detect the location of the ball
 3
 >>> fb.calcAcceleration()
 (0.5, 0.0)
+>>> fb.ball_history = [((1,1), 0), ((2,3), 1), ((3,9), 2)]
+>>> fb.calcAcceleration()
+(0.0, 2.0)
+>>> fb.ball_history = [((1,1), 0), ((2,3), 1), ((5,9), 2), ((11,18), 3)]
+>>> fb.calcAcceleration()
+(1.5, 1.5)
 """
 
 import numpy as np
