@@ -13,7 +13,7 @@ from MazeNodes import MazeNodes
 
 def main():
     # image = captureImage()
-    image = getImage('paintmaze_small.jpg')
+    image = getImage('maze_square_medium.png')
     mn = MazeNodes(image)
     mn.runProcessing()
 

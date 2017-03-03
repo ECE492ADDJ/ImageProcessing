@@ -52,7 +52,6 @@ class MazeNodes:
         gray_image = self.preProcessImage()
         self.findNodes(gray_image)
         self.findEdges()
-        #drawResults(self.image, self.nodes, [])
 
     def preProcessImage(self):
         # Find endone and white it out

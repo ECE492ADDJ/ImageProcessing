@@ -11,7 +11,7 @@ import cv2
 def captureVideo():
     cv2.namedWindow("preview")
     # John Montgomery, http://stackoverflow.com/questions/604749/how-do-i-access-my-webcam-in-python, 2017-02-08
-    vc = cv2.VideoCapture(2) # 2 is camera number (0 is computer webcam, 1 is "YouCam")
+    vc = cv2.VideoCapture(1) # 1 is camera number (0 is computer webcam)
 
     # Capture video
     if vc.isOpened(): # try to get the first frame
@@ -32,10 +32,12 @@ def captureVideo():
 def captureImage():
     # Take a single picture
     # Darshan Chaudhary, http://stackoverflow.com/questions/32943227/python-opencv-capture-images-from-webcam, 2017-02-08
-    vc = cv2.VideoCapture(2) # 2 is camera number (0 is computer webcam, 1 is "YouCam")
+    vc = cv2.VideoCapture(1) # 1 is camera number (0 is computer webcam)
     if vc.isOpened():
         s, im = vc.read() # captures image
     else:
-        im = NULL
+        im = None
+    # cv2.imshow("preview", im)
+    # cv2.imwrite("maze_photo_3.png", im)
     vc.release() # release camera capture
     return im

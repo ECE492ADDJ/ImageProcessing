@@ -3,44 +3,28 @@ Filename:       FindBall.py
 File type:      server-side python code
 Author:         Andrea McIntosh
 Created on:     2017-02-21
-Modified on:    2017-02-26
+Modified on:    2017-03-02
 Description:    Use video frames to continuously detect the location of the ball
 """
 
 import numpy as np
-import cv2, sys
+import cv2
 from ImageProcessingFunctions import *
-from MazeNodes import NUM_DIVS_X, NUM_DIVS_Y
+from MazeNodes import NUM_DIVS_X, NUM_DIVS_Y, START_THRESHOLD
 
-GREEN_THRESHOLD =  ([0, 150, 0], [160, 255, 160])
+class FindBall:
 
-def findBall(filename):
-    # load the image
-    image = cv2.imread(filename)
-    # Find pixel length of each grid div
-    x_div_len = int(len(image[0]) / NUM_DIVS_X) # floors number of divisions in width
-    y_div_len = int(len(image) / NUM_DIVS_Y) # floors number of divisions in height
+    def __init__(self, x_div_len, y_div_len, start_lower, start_upper):
+        # Get variables calcualted in MazeNodes
+        self.x_div_len = x_div_len
+        self.y_div_len = y_div_len
+        self.thresh_lower = start_lower
+        self.thresh_upper = start_upper
 
-    # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/, 2017-01-31
-    # create NumPy arrays from the boundaries
-    green_lower = np.array(GREEN_THRESHOLD[0], dtype = "uint8")
-    green_upper = np.array(GREEN_THRESHOLD[1], dtype = "uint8")
+    def findBall():
+        # Find ball and endzone:
+        # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
+        ball_mask = cv2.inRange(image, green_lower, green_upper) # find ball
+        ball_X, ball_Y = findRegionCenter(ball_mask)
 
-    # Find ball and endzone:
-    # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
-    ball_mask = cv2.inRange(image, green_lower, green_upper) # find green area (ball)
-    ball_X, ball_Y = findRegionCenter(ball_mask)
-
-    ball.coordinates = (ball_X, ball_Y)
-    ball.neighbours = []
-    ball.start = True
-    ball.end = False
-    image[np.where(ball_mask == [255])] = 255 # white out green ball
-    nodes[ball.coordinates] = ball
-
-    print ball_X, ball_Y
-
-if __name__ == '__main__':
-    # http://www.diveintopython.net/scripts_and_streams/command_line_arguments.html, 2017-02-08
-    image_name = sys.argv[1]
-    findBall(image_name)
+        print ball_X, ball_Y
