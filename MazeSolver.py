@@ -49,8 +49,9 @@ def main():
 
     trackImage = captureImage()
     fb = FindBall(mn.x_div_len, mn.y_div_len, mn.start_lower, mn.start_upper)
+
     while trackImage is not None:
-        fb.findBall(trackImage)
+        ball_x, ball_y = fb.findBall(trackImage)
         time.sleep(0.01) # small delay
         trackImage = captureImage()
 

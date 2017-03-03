@@ -1,9 +1,9 @@
 """
 Filename:       PathFinder.py
 File type:      server-side python code
-Author:         Jacob Charlebois
+Author:         Jacob Charlebois, Andrea McIntosh
 Created on:     2017-02-10
-Modified on:    2017-02-28
+Modified on:    2017-03-03
 Description:    Class that finds the shortest path between a start and end node
                 and stores it as an ordered list of nodes needed to be traversed
                 in order to solve a maze. It relies on the MazeNodes class to handle
