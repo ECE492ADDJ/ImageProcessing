@@ -32,7 +32,7 @@ def captureVideo():
 def captureImage():
     # Take a single picture
     # Darshan Chaudhary, http://stackoverflow.com/questions/32943227/python-opencv-capture-images-from-webcam, 2017-02-08
-    vc = cv2.VideoCapture(1) # 1 is camera number (0 is computer webcam)
+    vc = cv2.VideoCapture(0) # 1 is camera number (0 is computer webcam)
     if vc.isOpened():
         s, im = vc.read() # captures image
     else:

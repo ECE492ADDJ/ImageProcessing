@@ -31,12 +31,13 @@ def drawResults(image, all_nodes, path_nodes):
         if len(all_nodes.get(n).neighbours) > 4:
             print 'Too many neighbours!!'
         for nb in all_nodes.get(n).neighbours:
-            cv2.line(image, n, nb.coordinates, (nb.coordinates[0] % 255,
-                nb.coordinates[1] % 255, (nb.coordinates[0] + nb.coordinates[1]) % 255), 2)
+            cv2.line(image, n, nb.coordinates, (178, 178, 178), 2)
+            # cv2.line(image, n, nb.coordinates, (nb.coordinates[0] % 255,
+            #     nb.coordinates[1] % 255, (nb.coordinates[0] + nb.coordinates[1]) % 255), 2)
 
     # Draw path
     for n in range(0, len(path_nodes) - 1):
-        cv2.line(image, path_nodes[n].coordinates, path_nodes[n + 1].coordinates, (255, 100, 0), 2)
+        cv2.line(image, path_nodes[n].coordinates, path_nodes[n + 1].coordinates, (255, 200, 0), 2)
 
     # show the images
     cv2.imshow("images", np.hstack([image]))
