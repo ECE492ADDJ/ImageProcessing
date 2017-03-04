@@ -18,6 +18,9 @@ Description:    Use video frames to continuously detect the location of the ball
 >>> fb.ball_history = [((1,1), 0), ((2,3), 1), ((5,9), 2), ((11,18), 3)]
 >>> fb.calcAcceleration()
 (1.5, 1.5)
+>>> image = cv2.imread('ball_location_test.png')
+>>> fb.findBall(image)
+(124, 124)
 """
 
 import numpy as np
@@ -42,9 +45,9 @@ class FindBall:
         ball_mask = cv2.inRange(image, self.thresh_lower, self.thresh_upper) # find ball
         ball_x, ball_y = findRegionCenter(ball_mask)
 
-        ball_history.append(((ball_x, ball_y), time.clock())) # save position and time found at
+        self.ball_history.append(((ball_x, ball_y), time.clock())) # save position and time found at
 
-        print ball_x, ball_y
+        # print ball_x, ball_y
         return ball_x, ball_y
 
     def calcAcceleration(self):

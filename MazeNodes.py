@@ -21,7 +21,7 @@ NUM_DIVS_Y = 25
 # define the list of colour ranges
 PLAY_THRESHOLD =  ([240, 240, 240], [255, 255, 255])
 END_THRESHOLD =  ([0, 0, 150], [140, 140, 255])
-START_THRESHOLD =  ([0, 150, 0], [160, 255, 160])
+START_THRESHOLD =  ([50, 0, 0], [255, 150, 60])
 
 
 class MazeNodes:
