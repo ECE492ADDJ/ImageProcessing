@@ -36,10 +36,11 @@ class BallPathPlanner(object):
         self.weightingFactor = 0.7
         self.speed = 5
         self.proxThreshold = 10
-        self.latency = 0.05
+        self.latency = 0.005
 
         #self._velocities = self.generateVelocityList()
 
+        self._finished = False
         self._last_x = None
         self._last_y = None
         self._last_time = None
@@ -53,6 +54,7 @@ class BallPathPlanner(object):
         """
         if self._current_node_index == len(self._nodes):
             # Final node, we made it!
+            self._finished = True
             return (0, 0)
 
         curr = time.clock()
@@ -68,12 +70,15 @@ class BallPathPlanner(object):
         desired_vel = self._calculateVelocity(expected_ball_x,
                                         expected_ball_y, self._current_node_index)
 
-        dt = curr - self._last_time
-        acc = ((desired_vel[0] - vel[0]) / dt, (desired_vel[1] - vel[1]) / dt)
+        if self._last_time is None:
+            acc = (desired_vel[0], desired_vel[1])
+        else:
+            dt = curr - self._last_time
+            acc = ((desired_vel[0] - vel[0]) / dt, (desired_vel[1] - vel[1]) / dt)
 
         currentnode = self._nodes[self._current_node_index]
         dx = ball_x - currentnode.coordinates[0]
-        dy = ball_y = currentnode.coordinates[1]
+        dy = ball_y - currentnode.coordinates[1]
 
         if sqrt(dx * dx + dy * dy) <= self.proxThreshold:
             self._current_node_index += 1
@@ -82,6 +87,12 @@ class BallPathPlanner(object):
         self._last_y = ball_y
         self._last_time = time.clock()
         return acc
+
+    def isFinished(self):
+        """
+        Returns a boolean value indicating whether the end of the path has been reached.
+        """
+        return self._finished
 
     def _calculateVelocity(self, ball_x, ball_y, node_idx):
         """
