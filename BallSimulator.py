@@ -83,7 +83,7 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print "Invalid arguments. Usage: python BallSimulator.py [image]"
         print "Continuing with hard coded image file..."
-        imagepath = "paintmaze_small.png"
+        imagepath = "paintmaze_medium.png"
     else:
         imagepath = sys.argv[1]
 
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     path = pf.findPath()
 
     planner = bpp.BallPathPlanner(path)
-    planner.speed = 150
+    planner.speed = 400
     ballsim = BallSimulator(startNode.coordinates[0], startNode.coordinates[1])
 
     while not planner.isFinished():
@@ -119,11 +119,11 @@ if __name__ == '__main__':
 
         x, y = ballsim.getBallPos()
         #print "X: {0:6}, Y: {1:6}".format(x, y)
-        cv2.circle(image, (int(x), int(y)), 5, BALL_COLOUR)
+        cv2.circle(image, (int(x), int(y)), 8, BALL_COLOUR)
         acc = planner.getAcceleration(x, y)
         ballsim.setAcceleration(acc[0], acc[1])
 
-        time.sleep(0.03 - (time.clock() - start))
+        time.sleep(max(0.03 - (time.clock() - start), 0))
 
     cv2.imshow("Result", image)
     cv2.waitKey(0)
