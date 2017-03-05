@@ -15,13 +15,14 @@ import cv2
 from Node import *
 from ImageProcessingFunctions import *
 
-NUM_DIVS_X = 25
-NUM_DIVS_Y = 25
+NUM_DIVS_X = 80
+NUM_DIVS_Y = 80
 
 # define the list of colour ranges
-PLAY_THRESHOLD =  ([240, 240, 240], [255, 255, 255])
+PLAY_THRESHOLD =  ([200, 200, 200], [255, 255, 255])
 END_THRESHOLD =  ([0, 0, 150], [140, 140, 255])
-START_THRESHOLD =  ([50, 0, 0], [255, 150, 60])
+START_THRESHOLD =  ([0, 175, 0], [160, 255, 160])
+# START_THRESHOLD =  ([50, 0, 0], [255, 150, 60])
 
 
 class MazeNodes:

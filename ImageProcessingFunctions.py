@@ -18,13 +18,13 @@ def getImage(filename):
 
     return image
 
-def drawResults(image, all_nodes, path_nodes):
+def drawResults(image, all_nodes, path_nodes, start, end):
     # Draw nodes
     for n in all_nodes:
         cv2.circle(image, n, 3, (150, 150, 150), -1)
 
-    # cv2.circle(image, self.start.coordinates, 10, (0, 220, 220), -1)
-    # cv2.circle(image, self.end.coordinates, 10, (200, 10, 200), -1)
+    cv2.circle(image, start.coordinates, 10, (0, 220, 220), -1)
+    cv2.circle(image, end.coordinates, 10, (200, 10, 200), -1)
 
     # Draw edges
     for n in all_nodes:

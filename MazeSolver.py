@@ -20,13 +20,15 @@ import time
 
 def main():
 
-    image = getImage('paintmaze_small.png')
+    image = getImage('tests/paintmaze_medium.png')
 
     # Run initial image processing
     mn = MazeNodes(image)
     mn.runProcessing()
 
     nodes = mn.nodes
+
+    drawResults(image, nodes, [], mn.start, mn.end)
 
     startNode = Node()
     endNode = Node()
@@ -45,15 +47,15 @@ def main():
 
     directions = pf.translate(path)
 
-    drawResults(image, nodes, path)
+    drawResults(image, nodes, path, startNode, endNode)
 
-    trackImage = captureImage()
-    fb = FindBall(mn.x_div_len, mn.y_div_len, mn.start_lower, mn.start_upper)
-
-    while trackImage is not None:
-        ball_x, ball_y = fb.findBall(trackImage)
-        time.sleep(0.01) # small delay
-        trackImage = captureImage()
+    # trackImage = captureImage()
+    # fb = FindBall(mn.x_div_len, mn.y_div_len, mn.start_lower, mn.start_upper)
+    #
+    # while trackImage is not None:
+    #     ball_x, ball_y = fb.findBall(trackImage)
+    #     time.sleep(0.01) # small delay
+    #     trackImage = captureImage()
 
 
 if __name__ == '__main__':
