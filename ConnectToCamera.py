@@ -9,6 +9,9 @@ Description:    Functions for connecting to the usb webcam and capturing images
 import cv2
 
 def captureVideo():
+    """
+    Connect to camera, capture and display a video frame-by-frame
+    """
     cv2.namedWindow("preview")
     # John Montgomery, http://stackoverflow.com/questions/604749/how-do-i-access-my-webcam-in-python, 2017-02-08
     vc = cv2.VideoCapture(1) # 1 is camera number (0 is computer webcam)
@@ -18,7 +21,7 @@ def captureVideo():
         rval, frame = vc.read()
     else:
         rval = False
-
+    # Continually take and display images to create video feed
     while rval:
         cv2.imshow("preview", frame)
         rval, frame = vc.read()
@@ -30,14 +33,18 @@ def captureVideo():
     cv2.destroyWindow("preview")
 
 def captureImage():
-    # Take a single picture
+    """
+    Connect to camera, take and display a single image
+
+    Output: image captured by camera
+    """
     # Darshan Chaudhary, http://stackoverflow.com/questions/32943227/python-opencv-capture-images-from-webcam, 2017-02-08
     vc = cv2.VideoCapture(0) # 1 is camera number (0 is computer webcam)
     if vc.isOpened():
         s, im = vc.read() # captures image
     else:
         im = None
-    # cv2.imshow("preview", im)
-    # cv2.imwrite("maze_photo_3.png", im)
+    # Test: Display captured image
+    cv2.imshow("preview", im)
     vc.release() # release camera capture
     return im

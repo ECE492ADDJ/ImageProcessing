@@ -104,7 +104,9 @@ class MazeNodes:
         self.nodes[self.end.coordinates] = self.end
 
     def findNodes(self, gray_image):
-        """ Find all valid nodes in a grayscale image """
+        """
+        Find all valid nodes in a grayscale image
+        """
         # Run through all divisions
         for div_x in range(0, NUM_DIVS_X):
             for div_y in range(0, NUM_DIVS_Y):
@@ -121,8 +123,10 @@ class MazeNodes:
                     self.nodes[n.coordinates] = n
 
     def findEdges(self):
-        """ Find all edges between nodes.  Edges only connect immediately adjacent
-            nodes in straight (not diagonal) lines """
+        """
+        Find all edges between nodes.  Edges only connect immediately adjacent
+            nodes in straight (not diagonal) lines
+        """
         for nc in self.nodes:
             x = nc[0]
             y = nc[1]
