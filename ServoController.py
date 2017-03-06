@@ -1,3 +1,10 @@
+"""
+Filename:       ServoController.py
+File type:      server-side python code
+Author:         Dominic Trottier
+Description:    Allows you to control servos over serial port
+"""
+
 import serial
 import sys
 import re
@@ -17,7 +24,7 @@ class ServoConnection:
 	__CMD_SETY = "SY"
 	__CMD_GETX = "GX"
 	__CMD_GETY = "GY"
-	
+
 	def __init__(self, port='/dev/ttyS0', timeout=0.05):
 		self.serconn = serial.Serial(port, 57600, timeout=timeout)
 
@@ -164,6 +171,3 @@ if __name__ == '__main__':
 					continue
 			else:
 				print "Invalid command; try testconn, setx, sety, getx, or gety."
-
-
-	

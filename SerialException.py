@@ -1,3 +1,10 @@
+"""
+Filename:       SerialException.py
+File type:      server-side python code
+Author:         Dominic Trottier
+Description:    Custom exceptions for serial communication
+"""
+
 class SerialException(Exception):
 	pass
 
@@ -10,6 +17,3 @@ class InvalidResponseException(SerialException):
 
 if __name__ == '__main__':
 	pass
-
-
-	
