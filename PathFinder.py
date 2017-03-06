@@ -8,6 +8,41 @@ Description:    Class that finds the shortest path between a start and end node
                 and stores it as an ordered list of nodes needed to be traversed
                 in order to solve a maze. It relies on the MazeNodes class to handle
                 the image processing of converting an image to a dict of nodes.
+
+Testing for BFS algorithm
+>>> graph = {'A':['B', 'C'], 'B':['A', 'D'], 'D':['B', 'H'], 'H':['D', 'J'], 'J':['H'], 'C':['A', 'E'], 'E':['C', 'F', 'G'], 'F':['E'], 'G':['E']}
+>>> pf1 = PathFinder(graph, 'A', 'J')
+>>> pf1.shortestPath(graph, 'A', 'J')
+['A', 'B', 'D', 'H', 'J']
+>>> pf2 = PathFinder(graph, 'J', 'G')
+>>> pf2.shortestPath(graph, 'J', 'G')
+['J', 'H', 'D', 'B', 'A', 'C', 'E', 'G']
+>>> pf3 = PathFinder(graph, 'F', 'G')
+>>> pf3.shortestPath(graph, 'F', 'G')
+['F', 'E', 'G']
+
+Testing for translation
+>>> A = Node()
+>>> B = Node()
+>>> C = Node()
+>>> D = Node()
+>>> E = Node()
+>>> A.neighbours = [B, C]
+>>> B.neighbours = [A]
+>>> C.neighbours = [A, D]
+>>> D.neighbours = [C, E]
+>>> E.neighbours = [D]
+>>> A.coordinates = (1, 1)
+>>> B.coordinates = (2, 1)
+>>> C.coordinates = (1, 2)
+>>> D.coordinates = (1, 3)
+>>> E.coordinates = (2, 3)
+>>> nodes = {(1, 1):A, (2, 1):B, (1, 2):C, (1, 3):D, (2, 3):E}
+>>> pf4 = PathFinder(nodes, B, E)
+>>> path = pf4.findPath()
+>>> pf4.translate(path)
+['Left', 'Down', 'Down', 'Right']
+
 """
 
 # necessary packages
