@@ -47,9 +47,9 @@ class FindBall:
 
         self.ball_history.append(((ball_x, ball_y), time.clock())) # save position and time found at
 
-        # print ball_x, ball_y
         return ball_x, ball_y
 
+    # Based on previous 3 ball positions, determine current acceleration of the ball
     def calcAcceleration(self):
         len_hist = len(self.ball_history)
         if len_hist >= 3:
@@ -61,7 +61,8 @@ class FindBall:
             return acc_x, acc_y
         return None
 
-    # expects postions as tuples of ((x, y), time)
+    # Based on previous two positions, determine current velocity of the ball
+    # expects postions as tuples of position coordinates and time at that position: ((x, y), time)
     def calcVelocity(self, start_pos, curr_pos):
         # velocities in pixels/sec
         vel_x = (curr_pos[0][0] - start_pos[0][0]) / (curr_pos[1] - start_pos[1])
