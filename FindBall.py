@@ -40,7 +40,9 @@ class FindBall:
         self.ball_history = []
 
     def findBall(self, image):
-        # Find ball:
+        """
+        Determine current location of ball (center pixel location) in an image of the maze
+        """
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
         ball_mask = cv2.inRange(image, self.thresh_lower, self.thresh_upper) # find ball
         ball_x, ball_y = findRegionCenter(ball_mask)
@@ -49,8 +51,10 @@ class FindBall:
 
         return ball_x, ball_y
 
-    # Based on previous 3 ball positions, determine current acceleration of the ball
     def calcAcceleration(self):
+        """
+        Based on previous 3 ball positions, determine current acceleration of the ball
+        """
         len_hist = len(self.ball_history)
         if len_hist >= 3:
             vel_1_x, vel_1_y = self.calcVelocity(self.ball_history[len_hist - 3], self.ball_history[len_hist - 2])
@@ -61,14 +65,18 @@ class FindBall:
             return acc_x, acc_y
         return None
 
-    # Based on previous two positions, determine current velocity of the ball
-    # expects postions as tuples of position coordinates and time at that position: ((x, y), time)
     def calcVelocity(self, start_pos, curr_pos):
-        # velocities in pixels/sec
+        """
+        Based on previous two positions, determine current velocity of the ball
+
+        Input: expects postions as tuples of position coordinates and time at that position: ((x, y), time)
+        Output: velocities in pixels/sec
+        """
         vel_x = (curr_pos[0][0] - start_pos[0][0]) / (curr_pos[1] - start_pos[1])
         vel_y = (curr_pos[0][1] - start_pos[0][1]) / (curr_pos[1] - start_pos[1])
         return vel_x, vel_y
 
+# For running doctests
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
