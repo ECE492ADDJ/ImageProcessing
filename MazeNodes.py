@@ -7,6 +7,7 @@ Modified on:    2017-02-26
 Description:    Class that converts image of maze to a graph of nodes and edges
                 for pathfinding.  Nodes are found by spliting the image into a
                 grid and detecting colour regions.
+                Tested by printing out results using ImageProcessingFunctions.drawResults()
 """
 
 # import the necessary packages
@@ -24,7 +25,9 @@ END_THRESHOLD =  ([0, 0, 150], [140, 140, 255])
 START_THRESHOLD =  ([0, 175, 0], [160, 255, 160])
 
 class MazeNodes:
-    """ Take an image and convert it into nodes and edges for pathfinding """
+    """
+    Take an image and convert it into nodes and edges for pathfinding
+    """
 
     def __init__(self, image):
         self.image = image
