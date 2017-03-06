@@ -38,8 +38,6 @@ class BallPathPlanner(object):
         self.proxThreshold = 10
         self.latency = 0.005
 
-        #self._velocities = self.generateVelocityList()
-
         self._finished = False
         self._last_x = None
         self._last_y = None
@@ -51,6 +49,10 @@ class BallPathPlanner(object):
         Gets the acceleration required for the ball follow the planned path based on the current
         ball position. The acceleration is measured in pixels per second squared. This function
         must be called on a regular and frequent basis to work correctly.
+
+        ball_x: Horizontal position of the ball in pixels.
+
+        ball_y: Vertical position of the ball in pixels.
         """
         if self._current_node_index == len(self._nodes):
             # Final node, we made it!
@@ -114,27 +116,3 @@ class BallPathPlanner(object):
 
         return (vel[0] / sqrt(vel[0] * vel[0] + vel[1] * vel[1]) * self.speed,
                         vel[1] / sqrt(vel[0] * vel[0] + vel[1] * vel[1]) * self.speed)
-
-    def generateVelocityList(self):
-        """
-        Generates the list of required velocities for every node on the given path. These
-        velocities are normalized to have the correct speed based on the speed field.
-        """
-        velocities = []
-
-        for i in range(len(self._nodes) - 1):
-            # Ineffecient, each calculation is done 5 times.
-            curnodes = self._nodes[i:i + self.lookahead + 1]
-            temp_vel = [(curnodes[j + 1].coordinates[0] - curnodes[j].coordinates[0],
-                            curnodes[j + 1].coordinates[1] - curnodes[j].coordinates[1])
-                            for j in range(len(curnodes) - 1)]
-
-            vel = reduce(lambda v1, v2: \
-                            ((1 - self.weightingFactor) * v1[0] + self.weightingFactor * v2[0],
-                            (1 - self.weightingFactor) * v1[1] + self.weightingFactor * v2[1]),
-                            temp_vel[::-1])
-
-            velocities.append((vel[0] / sqrt(vel[0] * vel[0] + vel[1] * vel[1]) * self.speed,
-                            vel[1] / sqrt(vel[0] * vel[0] + vel[1] * vel[1]) * self.speed))
-
-        return velocities
