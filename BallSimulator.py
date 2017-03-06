@@ -7,9 +7,7 @@ Author:         Dominic Trottier
 Description:    This files contains the revelant code for simulating the ball position in the maze.
 """
 import sys
-import os
 import time
-import threading
 import cv2
 import BallPathPlanner as bpp
 import Node
@@ -43,7 +41,8 @@ class BallSimulator(object):
 
     def getBallPos(self):
         """
-        Gets the simulated position of the ball based on the given acceleration.
+        Gets the simulated position of the ball based on the given acceleration. Returns the
+        position as a tuple in the form (x, y).
         """
         self._updateBallPos()
 
@@ -52,11 +51,15 @@ class BallSimulator(object):
     def setAcceleration(self, acc_x, acc_y):
         """
         Changes the acceleration to a new value. This method will block while simulating latency.
+
+        acc_x: Horizontal acceleration measured in pixels per second squared.
+
+        acc_y: Vertical acceleration measured in pixels per second squared.
         """
         if self.simulate_latency:
             #threading.Timer(self.latency, self._setAccelerationNow, [acc_x, acc_y])
-            start = time.clock()
-            while time.clock() - start < self.latency:
+            latency_start = time.clock()
+            while time.clock() - latency_start < self.latency:
                 pass
             self._setAccelerationNow(acc_x, acc_y)
         else:
