@@ -5,8 +5,7 @@ Author:         Andrea McIntosh
 Created on:     2017-02-21
 Modified on:    2017-02-26
 Description:    Utility functions for image processing.  Functions that are
-                required by both MazeNodes.py and FindBall.py are saved here to
-                avoid redundancy.
+                required by multiple modules are saved here to avoid redundancy.
 """
 
 import numpy as np

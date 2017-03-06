@@ -13,7 +13,7 @@ from math import sqrt
 
 class BallPathPlanner(object):
     """
-    This class uses an ordered list of nodes plan a path for the ball to follow as it moves through
+    This class uses an ordered list of nodes to plan a path for the ball to follow as it moves through
     the maze. This class has the following members:
 
     lookahead: The number of consecutive nodes that are used in calculating the velocity for a

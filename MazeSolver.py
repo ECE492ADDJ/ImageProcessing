@@ -19,7 +19,8 @@ from ConnectToCamera import captureImage
 import time
 
 def main():
-
+    # A static test image for un-integrated testing.  Will be replaced by an image
+    #  from the USB camera in the future
     image = getImage('tests/paintmaze_medium.png')
 
     # Run initial image processing
@@ -28,34 +29,33 @@ def main():
 
     nodes = mn.nodes
 
+    # Test: draw results of image processing (nodes and edges found)
     drawResults(image, nodes, [], mn.start, mn.end)
 
-    startNode = Node()
-    endNode = Node()
+    startNode = mn.start
+    endNode = mn.end
 
-    for n in nodes:
-    	if nodes.get(n).start:
-    		startNode = nodes.get(n)
-    	if nodes.get(n).end:
-    		endNode = nodes.get(n)
-
+    # Start and end nodes not necessarily on grid with other nodes, must find
+    #  their neighbours separately
     findRegionCenterNeighbours(startNode, nodes, mn.x_div_len, mn.y_div_len)
     findRegionCenterNeighbours(endNode, nodes, mn.x_div_len, mn.y_div_len)
 
+    # Find path through maze
     pf = PathFinder(nodes, startNode, endNode)
     path = pf.findPath()
-
     directions = pf.translate(path)
 
+    # Test: draw result of pathfinding
     drawResults(image, nodes, path, startNode, endNode)
 
-    # trackImage = captureImage()
-    # fb = FindBall(mn.x_div_len, mn.y_div_len, mn.start_lower, mn.start_upper)
-    #
-    # while trackImage is not None:
-    #     ball_x, ball_y = fb.findBall(trackImage)
-    #     time.sleep(0.01) # small delay
-    #     trackImage = captureImage()
+    # Live ball tracking
+    trackImage = captureImage()
+    fb = FindBall(mn.x_div_len, mn.y_div_len, mn.start_lower, mn.start_upper)
+
+    while trackImage is not None:
+        ball_x, ball_y = fb.findBall(trackImage)
+        time.sleep(0.01) # small delay
+        trackImage = captureImage()
 
 
 if __name__ == '__main__':
