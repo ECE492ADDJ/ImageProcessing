@@ -26,7 +26,7 @@ Description:    Use video frames to continuously detect the location of the ball
 import numpy as np
 import cv2, time
 from ImageProcessingFunctions import *
-from MazeNodes import NUM_DIVS_X, NUM_DIVS_Y, START_THRESHOLD
+#from MazeNodes import NUM_DIVS_X, NUM_DIVS_Y, START_THRESHOLD
 
 class FindBall:
 
