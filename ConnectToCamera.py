@@ -12,9 +12,10 @@ def captureVideo():
     """
     Connect to camera, capture and display a video frame-by-frame
     """
+    cameraIndex = findCameraIndex()
     cv2.namedWindow("preview")
     # John Montgomery, http://stackoverflow.com/questions/604749/how-do-i-access-my-webcam-in-python, 2017-02-08
-    vc = cv2.VideoCapture(1) # 1 is camera number (0 is computer webcam)
+    vc = cv2.VideoCapture(cameraIndex)
 
     # Capture video
     if vc.isOpened(): # try to get the first frame
@@ -38,8 +39,9 @@ def captureImage():
 
     Output: image captured by camera
     """
+    cameraIndex = findCameraIndex()
     # Darshan Chaudhary, http://stackoverflow.com/questions/32943227/python-opencv-capture-images-from-webcam, 2017-02-08
-    vc = cv2.VideoCapture(0) # 1 is camera number (0 is computer webcam)
+    vc = cv2.VideoCapture(cameraIndex) 
     if vc.isOpened():
         s, im = vc.read() # captures image
     else:
@@ -48,3 +50,21 @@ def captureImage():
     cv2.imshow("preview", im)
     vc.release() # release camera capture
     return im
+
+def findCameraIndex():
+    """
+    Find the index of the usb camera.  This function assumes that the usb camera is indexed last out
+    of all connectable cameras.
+
+    Output: camera index for OpenCV to connect to
+    """
+    ind = 0
+    # Iterate through indexes until one does not open a valid camera object
+    while True:
+        vc = cv2.VideoCapture(ind)
+        if vc.isOpened():
+            vc.release()
+            ind += 1
+        else:
+            # Once an invalid index is reached, return previous valid index
+            return ind - 1
