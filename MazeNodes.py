@@ -1,3 +1,5 @@
+#pylint: disable=E1101
+
 """
 Filename:       MazeNodes.py
 File type:      server-side python code
@@ -16,13 +18,10 @@ import cv2
 from Node import *
 from ImageProcessingFunctions import *
 
-NUM_DIVS_X = 80
-NUM_DIVS_Y = 80
-
 # define the list of colour ranges
-PLAY_THRESHOLD =  ([200, 200, 200], [255, 255, 255])
-END_THRESHOLD =  ([0, 0, 150], [140, 140, 255])
-START_THRESHOLD =  ([0, 175, 0], [160, 255, 160])
+PLAY_THRESHOLD = ([200, 200, 200], [255, 255, 255])
+END_THRESHOLD = ([0, 0, 150], [140, 140, 255])
+START_THRESHOLD = ([0, 175, 0], [160, 255, 160])
 
 class MazeNodes:
     """
@@ -45,9 +44,15 @@ class MazeNodes:
         self.play_lower = np.array(PLAY_THRESHOLD[0], dtype = "uint8")
         self.play_upper = np.array(PLAY_THRESHOLD[1], dtype = "uint8")
 
-        # Find pixel length of each grid div
-        self.x_div_len = int(len(image[0]) / NUM_DIVS_X) # floors number of divisions in width
-        self.y_div_len = int(len(image) / NUM_DIVS_Y) # floors number of divisions in height
+        self.x_div_len = None
+        self.y_div_len = None
+
+        self.x_div_count = None
+        self.y_div_count = None
+
+        self.min_path_thickness = 10
+        self.scan_interval = 20
+        self.nodes_per_path = 3
 
 
     def runProcessing(self):
@@ -77,6 +82,13 @@ class MazeNodes:
         mask = cv2.inRange(self.image, self.play_lower, self.play_upper) # find white (playing) area
         self.image[np.where(mask == [255])] = 255 # white out white
         self.image[np.where(mask != [255])] = 0 # white out white
+
+        # Determine the grid size based on path thickness
+        path_width, path_height = self._getPathThickness(mask)
+        self.x_div_count = int(len(self.image[0]) / (path_width / (self.nodes_per_path + 1)))
+        self.y_div_count = int(len(self.image) / (path_height / (self.nodes_per_path + 1)))
+        self.x_div_len = int(len(self.image[0]) / self.x_div_count)
+        self.y_div_len = int(len(self.image) / self.y_div_count)
 
         # Convert mask output to greyscale
         # http://docs.opencv.org/3.2.0/df/d9d/tutorial_py_colorspaces.html, 2017-02-05
@@ -110,9 +122,12 @@ class MazeNodes:
         """
         Find all valid nodes in a grayscale image
         """
+        if self.x_div_count is None or self.y_div_count is None:
+            raise RuntimeError("Image preprocessing has not been run.")
+
         # Run through all divisions
-        for div_x in range(0, NUM_DIVS_X):
-            for div_y in range(0, NUM_DIVS_Y):
+        for div_x in range(0, self.x_div_count):
+            for div_y in range(0, self.y_div_count):
                 wall = False
                 # Because image is a list of lists, need to run through the rows for each div
                 for y_i in range(div_y*self.y_div_len, (div_y+1)*self.y_div_len):
@@ -143,3 +158,67 @@ class MazeNodes:
                 nc_neighbours.append(self.nodes.get((x, y - self.y_div_len)))
             if (x, y + self.y_div_len) in self.nodes:
                 nc_neighbours.append(self.nodes.get((x, y + self.y_div_len)))
+
+    #Naive and slow implementation
+    def _getPathThickness(self, mask):
+        """
+        Determines the path thickness by scanning row by row and column by column. The minimum
+        thickness of play space (as determined by the mask) in each direction is used. Any paths
+        found that are narrower than min_path_thickness are ignored. To improve speed, scanning is
+        done at a given interval of scan_interval.
+
+        mask: The mask of the play space. It is assumed that 0 represents non play area and 255
+        represents play area.
+
+        NOTE: This code assumes that the mask of the maze will only feature walls oriented at 90
+        degrees from each other and that these walls will be aligned with the rows and columns of
+        the image.
+        """
+        width = float("inf")
+        height = float("inf")
+
+        # Rows
+        for i in range(0, mask.shape[0], self.scan_interval):
+            temp = self._getShortestSequence(mask[i])
+            if temp > self.min_path_thickness:
+                width = min(width, temp)
+
+        # Columns
+        for j in range(0, mask.shape[1], self.scan_interval):
+            temp = self._getShortestSequence(mask[:, j])
+            if temp > self.min_path_thickness:
+                height = min(height, temp)
+
+        if width == float("inf"):
+            raise ValueError("No valid path width found. The scan interval may be too high.")
+
+        if height == float("inf"):
+            raise ValueError("No valid path height found. The scan interval may be too high.")
+
+        return (width, height)
+
+    def _getShortestSequence(self, pixels):
+        """
+        Finds the length of the shortest sequence of play space pixels in a line of pixels. A play
+        space pixel is assumed to have a value of 255 while a non play space pixel is assumed to
+        have a value of 0. Returns float("inf") if no play space pixels are found.
+
+        pixels: An iterable object containing the pixel values.
+        """
+        count = 0
+        mincount = float("inf")
+        prevpixel = 0
+
+        for pixel in pixels:
+            if pixel == 0 and prevpixel != 0:
+                mincount = min(count, mincount)
+                count = 0
+            elif pixel == 255:
+                count += 1
+
+            prevpixel = pixel
+
+        if prevpixel != 0:
+            mincount = min(count, mincount)
+
+        return mincount
