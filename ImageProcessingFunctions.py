@@ -42,8 +42,6 @@ def drawResults(image, all_nodes, path_nodes, start, end):
 
     # Draw edges
     for n in all_nodes:
-        if len(all_nodes.get(n).neighbours) > 4:
-            print 'Too many neighbours!!'
         for nb in all_nodes.get(n).neighbours:
             cv2.line(image, n, nb.coordinates, (178, 178, 178), 2)
 

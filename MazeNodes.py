@@ -19,9 +19,16 @@ from Node import *
 from ImageProcessingFunctions import *
 
 # define the list of colour ranges
+"""
+# Test image thresholds:
 PLAY_THRESHOLD = ([200, 200, 200], [255, 255, 255])
 END_THRESHOLD = ([0, 0, 150], [140, 140, 255])
 START_THRESHOLD = ([0, 175, 0], [160, 255, 160])
+"""
+# Camera image thresholds:
+PLAY_THRESHOLD = ([175, 175, 175], [255, 255, 255])
+END_THRESHOLD = ([0, 0, 150], [140, 140, 255])
+START_THRESHOLD = ([50, 0, 0], [255, 150, 60])
 
 class MazeNodes:
     """
