@@ -10,6 +10,25 @@ Description:    Class that converts image of maze to a graph of nodes and edges
                 for pathfinding.  Nodes are found by spliting the image into a
                 grid and detecting colour regions.
                 Tested by printing out results using ImageProcessingFunctions.drawResults()
+
+>>> image = cv2.imread("tests/MazeNodes_pytest_small_maze.png")
+>>> mn = MazeNodes(image)
+>>> g_img = mn.preProcessImage()
+>>> mn.x_div_count
+4
+>>> mn.y_div_count
+5
+>>> mn.x_div_len
+125
+>>> mn.y_div_len
+50
+>>> mn.start.coordinates
+(75, 125)
+>>> mn.end.coordinates
+(425, 125)
+>>> mn.findNodes(g_img)
+>>> len(mn.nodes)
+8
 """
 
 # import the necessary packages
@@ -230,3 +249,8 @@ class MazeNodes:
             mincount = min(count, mincount)
 
         return mincount
+
+# For running doctests
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
