@@ -21,7 +21,7 @@ import time
 def main():
     # A static test image for un-integrated testing.  Will be replaced by an image
     #  from the USB camera in the future
-    image = getImage('tests/maze_photo_4.png')
+    image = getImage('tests/paintmaze_medium.png')
 
     # Run initial image processing
     mn = MazeNodes(image)

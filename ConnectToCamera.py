@@ -41,13 +41,13 @@ def captureImage():
     """
     cameraIndex = findCameraIndex()
     # Darshan Chaudhary, http://stackoverflow.com/questions/32943227/python-opencv-capture-images-from-webcam, 2017-02-08
-    vc = cv2.VideoCapture(cameraIndex) 
+    vc = cv2.VideoCapture(cameraIndex)
     if vc.isOpened():
         s, im = vc.read() # captures image
     else:
         im = None
     # Test: Display captured image
-    cv2.imshow("preview", im)
+    # cv2.imshow("preview", im)
     vc.release() # release camera capture
     return im
 
