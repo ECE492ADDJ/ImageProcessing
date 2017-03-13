@@ -6,7 +6,7 @@ Created on:     2017-02-21
 Modified on:    2017-03-02
 Description:    Use video frames to continuously detect the location of the ball
 
->>> fb = FindBall(5, 5, (0, 0, 0), (255, 255, 255))
+>>> fb = FindBall(5, 5, (0, 0, 0), (255, 50, 0))
 >>> fb.ball_history = [((1,1), 0), ((2,1), 1), ((4,1), 2)]
 >>> len(fb.ball_history)
 3
@@ -18,9 +18,9 @@ Description:    Use video frames to continuously detect the location of the ball
 >>> fb.ball_history = [((1,1), 0), ((2,3), 1), ((5,9), 2), ((11,18), 3)]
 >>> fb.calcAcceleration()
 (1.5, 1.5)
->>> image = cv2.imread('ball_location_test.png')
+>>> image = cv2.imread('tests/ball_location_test.png')
 >>> fb.findBall(image)
-(124, 124)
+(125, 125)
 """
 
 import numpy as np

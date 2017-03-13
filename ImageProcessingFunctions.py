@@ -6,6 +6,31 @@ Created on:     2017-02-21
 Modified on:    2017-02-26
 Description:    Utility functions for image processing.  Functions that are
                 required by multiple modules are saved here to avoid redundancy.
+
+>>> im = cv2.imread('tests/ball_location_test.png')
+>>> len(im)
+250
+>>> len(im[0])
+250
+>>> ball_mask = cv2.inRange(im, (0, 0, 0), (255, 50, 0))
+>>> findRegionCenter(ball_mask)
+(125, 125)
+>>> from Node import Node
+>>> n1 = Node()
+>>> n1.coordinates = (0,0)
+>>> n1.neighbours = []
+>>> n2 = Node()
+>>> n2.coordinates = (10,10)
+>>> n2.neighbours = []
+>>> rc = Node()
+>>> rc.coordinates = (1,2)
+>>> rc.neighbours = []
+>>> nodes = {(0,0): n1, (1,2): rc, (10,10): n2}
+>>> findRegionCenterNeighbours(rc, nodes, 4, 3)
+>>> len(rc.neighbours)
+1
+>>> rc.neighbours[0] == n1
+True
 """
 
 import numpy as np
@@ -90,3 +115,8 @@ def findRegionCenterNeighbours(rc_node, nodes, x_div_len, y_div_len):
             if ((nx, ny) != (x, y)) and ((nx, ny) in nodes):
                 rc_node.neighbours.append(nodes.get((nx, ny)))
                 nodes.get((nx, ny)).neighbours.append(rc_node)
+
+# For running doctests
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
