@@ -14,14 +14,18 @@ from MazeNodes import MazeNodes
 from PathFinder import PathFinder
 from FindBall import FindBall
 from ImageProcessingFunctions import *
-from ConnectToCamera import captureImage
+from ConnectToCamera import *
 
 import time
 
 def main():
     # A static test image for un-integrated testing.  Will be replaced by an image
     #  from the USB camera in the future
-    image = getImage('tests/MazeNodes_pytest_small_maze.png')
+    image = getImage('paintmaze_medium.png')
+
+    # Capture image from usb camera
+    vc = connectCamera()
+    # image = captureImage(vc)
 
     # Run initial image processing
     mn = MazeNodes(image)
@@ -49,13 +53,17 @@ def main():
     drawResults(image, nodes, path, startNode, endNode)
 
     # Live ball tracking
-    trackImage = captureImage()
+    trackImage = captureImage(vc)
     fb = FindBall(mn.x_div_len, mn.y_div_len, mn.start_lower, mn.start_upper)
 
     while trackImage is not None:
+        s1 = time.clock()
         ball_x, ball_y = fb.findBall(trackImage)
-        time.sleep(0.01) # small delay
-        trackImage = captureImage()
+        trackImage = captureImage(vc)
+        # print ball_x, ball_y
+        s2 = time.clock()
+        print str(s2- s1)
+    releaseCamera(vc) # release camera capture
 
 
 if __name__ == '__main__':

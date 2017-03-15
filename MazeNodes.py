@@ -45,9 +45,9 @@ END_THRESHOLD = ([0, 0, 150], [140, 140, 255])
 START_THRESHOLD = ([0, 175, 0], [160, 255, 160])
 """
 # Camera image thresholds:
-PLAY_THRESHOLD = ([175, 175, 175], [255, 255, 255])
-END_THRESHOLD = ([0, 0, 150], [140, 140, 255])
-START_THRESHOLD = ([50, 0, 0], [255, 150, 60])
+PLAY_THRESHOLD = ([40, 40, 40], [255, 255, 255])
+END_THRESHOLD = ([160, 80, 230], [180, 100, 255])
+START_THRESHOLD = ([10, 150, 170], [40, 190, 210])
 """
 
 class MazeNodes:
@@ -109,6 +109,8 @@ class MazeNodes:
         mask = cv2.inRange(self.image, self.play_lower, self.play_upper) # find white (playing) area
         self.image[np.where(mask == [255])] = 255 # white out white
         self.image[np.where(mask != [255])] = 0 # white out white
+
+        drawResults(self.image, self.nodes, [], self.start, self.end)
 
         # Determine the grid size based on path thickness
         path_width, path_height = self._getPathThickness(mask)
