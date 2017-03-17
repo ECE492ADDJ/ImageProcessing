@@ -3,10 +3,11 @@ Filename:       ConnectToCamera.py
 File type:      server-side python code
 Author:         Andrea McIntosh
 Created on:     2017-02-08
-Modified on:    2017-02-26
+Modified on:    2017-03-16
 Description:    Functions for connecting to the usb webcam and capturing images
 """
 import cv2
+import os
 
 def connectCamera():
     cameraIndex = findCameraIndex()
@@ -70,3 +71,8 @@ def findCameraIndex():
             # Once an invalid index is reached, return previous valid index
             return ind - 1
             # return 0
+
+def cameraName():
+    # Ravichandra, http://stackoverflow.com/questions/33784537/python-get-name-of-a-usb-flash-drive-device-windows, 2017-03-16
+    # Utsav Dawn, http://stackoverflow.com/questions/28622523/windows-cmd-command-for-accessing-usb, 2017-03-16
+    x = os.system('wmic logicaldisk where drivetype=2 get deviceid, volumename, description')
