@@ -80,12 +80,18 @@ def drawResults(image, all_nodes, path_nodes, start, end):
     cv2.waitKey(0)
 
 
-def findRegionCenter(mask):
+def findRegionCenter(mask, se1, se2):
     """
-    Use OpenCV to find the center of a colour region.
+    Use OpenCV to find the center of a colour region.  Includes filtering the
+    input mask to reduce noise.
 
     Input: mask showing the location of the colour region
     """
+    # Filter mask to reduce noise
+    # rayryeng, http://stackoverflow.com/questions/30369031/remove-spurious-small-islands-of-noise-in-an-image-python-opencv, 2017-03-16
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, se1)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, se2)
+
     # http://docs.opencv.org/3.1.0/dd/d49/tutorial_py_contour_features.html, 2017-02-08
     ret, thresh = cv2.threshold(mask, 127, 255, 0)
     contours = cv2.findContours(thresh, 1, 2)

@@ -21,7 +21,7 @@ import time
 def main():
     # A static test image for un-integrated testing.  Will be replaced by an image
     #  from the USB camera in the future
-    image = getImage('paintmaze_medium.png')
+    image = getImage('tests\maze_photo.png')
 
     # Capture image from usb camera
     vc = connectCamera()
@@ -58,7 +58,7 @@ def main():
 
     while trackImage is not None:
         s1 = time.clock()
-        ball_x, ball_y = fb.findBall(trackImage)
+        ball_x, ball_y = fb.findBall(trackImage, mn.filt_small, mn.filt_large)
         trackImage = captureImage(vc)
         # print ball_x, ball_y
         s2 = time.clock()

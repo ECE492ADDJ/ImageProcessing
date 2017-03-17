@@ -39,13 +39,13 @@ class FindBall:
 
         self.ball_history = []
 
-    def findBall(self, image):
+    def findBall(self, image, filt_small, filt_large):
         """
         Determine current location of ball (center pixel location) in an image of the maze
         """
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
         ball_mask = cv2.inRange(image, self.thresh_lower, self.thresh_upper) # find ball
-        ball_x, ball_y = findRegionCenter(ball_mask)
+        ball_x, ball_y = findRegionCenter(ball_mask, filt_small, filt_large)
 
         self.ball_history.append(((ball_x, ball_y), time.clock())) # save position and time found at
 
