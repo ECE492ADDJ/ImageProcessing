@@ -30,12 +30,10 @@ from ImageProcessingFunctions import *
 
 class FindBall:
 
-    def __init__(self, x_div_len, y_div_len, start_lower, start_upper):
-        # Get variables calcualted in MazeNodes
-        self.x_div_len = x_div_len
-        self.y_div_len = y_div_len
-        self.thresh_lower = start_lower
-        self.thresh_upper = start_upper
+    def __init__(self, start_lower, start_upper):
+        # Get variables calculated in MazeNodes
+        self.thresh_lower = np.array(start_lower, dtype="uint8")
+        self.thresh_upper = np.array(start_upper, dtype="uint8")
 
         self.ball_history = []
 

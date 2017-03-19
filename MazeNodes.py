@@ -37,19 +37,6 @@ import cv2
 from Node import *
 from ImageProcessingFunctions import *
 
-# define the list of colour ranges
-"""
-# Test image thresholds:
-PLAY_THRESHOLD = ([200, 200, 200], [255, 255, 255])
-END_THRESHOLD = ([0, 0, 150], [140, 140, 255])
-START_THRESHOLD = ([0, 175, 0], [160, 255, 160])
-"""
-# Camera image thresholds:
-PLAY_THRESHOLD = ([40, 40, 40], [255, 255, 255])
-END_THRESHOLD = ([160, 80, 230], [180, 100, 255])
-START_THRESHOLD = ([0, 90, 100], [50, 220, 220])
-# """
-
 class MazeNodes:
     """
     Take an image and convert it into nodes and edges for pathfinding
@@ -62,14 +49,12 @@ class MazeNodes:
         self.end = Node()
         self.start = Node()
 
-        # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/, 2017-01-31
-        # Create thresholds for colour detection
-        self.end_lower = np.array(END_THRESHOLD[0], dtype = "uint8")
-        self.end_upper = np.array(END_THRESHOLD[1], dtype = "uint8")
-        self.start_lower = np.array(START_THRESHOLD[0], dtype = "uint8")
-        self.start_upper = np.array(START_THRESHOLD[1], dtype = "uint8")
-        self.play_lower = np.array(PLAY_THRESHOLD[0], dtype = "uint8")
-        self.play_upper = np.array(PLAY_THRESHOLD[1], dtype = "uint8")
+        self.end_lower = [0, 0, 150]
+        self.end_upper = [140, 140, 255]
+        self.start_lower = [0, 175, 0]
+        self.start_upper = [160, 255, 160]
+        self.play_lower = [200, 200, 200]
+        self.play_upper = [255, 255, 255]
 
         # rayryeng, http://stackoverflow.com/questions/30369031/remove-spurious-small-islands-of-noise-in-an-image-python-opencv, 2017-03-16
         self.filt_small = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
@@ -99,22 +84,29 @@ class MazeNodes:
         Prepare image for subsequent image processing.  Modifies original image
         object and also returns a grayscale version of the image
         """
+        # http://www.pyimagesearch.com/2014/08/04/opencv-python-color-detection/, 2017-01-31
+        # Create thresholds for colour detection
+        end_lower_np = np.array(self.end_lower, dtype="uint8")
+        end_upper_np = np.array(self.end_upper, dtype="uint8")
+        start_lower_np = np.array(self.start_lower, dtype="uint8")
+        start_upper_np = np.array(self.start_upper, dtype="uint8")
+        play_lower_np = np.array(self.play_lower, dtype="uint8")
+        play_upper_np = np.array(self.play_upper, dtype="uint8")
+
         # Find endone and white it out
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
-        end_mask = cv2.inRange(self.image, self.end_lower, self.end_upper) # find endzone area
+        end_mask = cv2.inRange(self.image, end_lower_np, end_upper_np) # find endzone area
         self.findEnd(end_mask)
         self.image[np.where(end_mask == [255])] = 255 # white out endzone
 
         # Find start (ball) and white it out
-        start_mask = cv2.inRange(self.image, self.start_lower, self.start_upper) # find ball (start)
+        start_mask = cv2.inRange(self.image, start_lower_np, start_upper_np) # find ball (start)
         self.findStart(start_mask)
         self.image[np.where(start_mask == [255])] = 255 # white out ball
 
-        mask = cv2.inRange(self.image, self.play_lower, self.play_upper) # find white (playing) area
+        mask = cv2.inRange(self.image, play_lower_np, play_upper_np) # find white (playing) area
         self.image[np.where(mask == [255])] = 255 # white out white
         self.image[np.where(mask != [255])] = 0 # white out white
-
-        drawResults(self.image, self.nodes, [], self.start, self.end)
 
         # Determine the grid size based on path thickness
         path_width, path_height = self._getPathThickness(mask)
