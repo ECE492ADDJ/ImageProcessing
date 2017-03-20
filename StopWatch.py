@@ -15,7 +15,7 @@ class StopWatch(Frame):
 
     def makeWidgets(self):                         
         """ Make the time label. """
-        l = Label(self, textvariable=self.timestr)
+        l = Label(self, textvariable=self.timestr, bg="#006666")
         self._setTime(self._elapsedtime)
         l.pack(fill=X, expand=NO, pady=2, padx=2)                      
     

@@ -9,83 +9,74 @@ Description:    Gui for entire project
 
 from Tkinter import *
 # from MazeSolver import MazeSolver
+from PIL import Image, ImageTk
+from StopWatch import StopWatch
 import cv2
 import numpy as np
 import tkMessageBox
-from PIL import Image
-from PIL import ImageTk
 import tkFileDialog
 import sys
 import glob
 import serial
-from StopWatch import StopWatch
-
 
 class Gui:
+
 	def __init__(self, master):
-				
-		# # Toolbar
-			# toolbar = Frame(master, bg="blue")
-			# startMaskbtn = Button(toolbar, text="Start Mask", command=self.grabVariables)
-			# startMaskbtn.pack(side=LEFT, padx=2,pady=2)
-			# endMaskbtn = Button(toolbar, text="End Mask", command=self.grabVariables)
-			# endMaskbtn.pack(side=LEFT, padx=2,pady=2)
-			# pathMaskbtn = Button(toolbar, text="Path", command=self.grabVariables)
-			# pathMaskbtn.pack(side=LEFT, padx=2,pady=2)
-			# toolbar.pack(side=TOP, fill=X)
 
 		frame = Frame(master, bg="#006666")
-		frame.grid(row=0, column=0, rowspan=9, columnspan=4)
-		#frame.pack(fill=BOTH)
+		frame.grid(row=0, column=0, rowspan=1, columnspan=1)
+		# frame.pack(fill=BOTH)
 
 		# Labels
-		Label(frame, text="Please Enter Variables", font=("Helvetica", 18)).grid(row=0, columnspan=3)
-		Label(frame, text="Upper (as B,G,R)", font=("Helvetica", 18)).grid(row=1, column=1)
-		Label(frame, text="Lower (as B,G,R)", font=("Helvetica", 18)).grid(row=1, column=2)
-		Label(frame, text="PlaySpace Thresholds", font=("Helvetica", 16)).grid(row=2, sticky=E)
-		Label(frame, text="Start Thresholds", font=("Helvetica", 16)).grid(row=3, sticky=E)
-		Label(frame, text="End Thresholds", font=("Helvetica", 16)).grid(row=4, sticky=E)
-		Label(frame, text="Serial Ports",font=("Helvetica", 16)).grid(row=5, sticky=E)
-		Label(frame, text="Camera",font=("Helvetica", 16)).grid(row=6, sticky=E)
-		Label(frame, text="  ").grid(row=7, sticky=E)
+		Label(frame, text="Please Enter Variables", font=("Helvetica", 18), bg="#006666").grid(row=0, columnspan=3)
+		Label(frame, text="Upper (as B,G,R)", font=("Helvetica", 18), bg="#006666").grid(row=1, column=1)
+		Label(frame, text="Lower (as B,G,R)", font=("Helvetica", 18), bg="#006666").grid(row=1, column=2)
+		Label(frame, text="PlaySpace Thresholds", font=("Helvetica", 16), bg="#006666").grid(row=2, sticky=E)
+		Label(frame, text="Start Thresholds", font=("Helvetica", 16), bg="#006666").grid(row=3, sticky=E)
+		Label(frame, text="End Thresholds", font=("Helvetica", 16), bg="#006666").grid(row=4, sticky=E)
+		Label(frame, text="Serial Ports",font=("Helvetica", 16), bg="#006666").grid(row=5, sticky=E)
+		Label(frame, text="Camera",font=("Helvetica", 16), bg="#006666").grid(row=6, sticky=E)
+		Label(frame, text="  ", bg="#006666").grid(row=7, sticky=E)
 
 		# Text Fields
-		playSpaceEntry1 = Entry(frame)
-		playSpaceEntry1.grid(row=2,column=1)
-		playSpaceEntry2 = Entry(frame)
-		playSpaceEntry2.grid(row=2,column=2)
-		startEntry1 = Entry(frame)
-		startEntry1.grid(row=3,column=1)
-		startEntry2 = Entry(frame)
-		startEntry2.grid(row=3,column=2)
-		endEntry1 = Entry(frame)
-		endEntry1.grid(row=4,column=1)
-		endEntry2 = Entry(frame)
-		endEntry2.grid(row=4,column=2)
+		self.playSpaceEntry1 = Entry(frame)
+		self.playSpaceEntry1.grid(row=2,column=1)
+		self.playSpaceEntry2 = Entry(frame)
+		self.playSpaceEntry2.grid(row=2,column=2)
+		self.startEntry1 = Entry(frame)
+		self.startEntry1.grid(row=3,column=1)
+		self.startEntry2 = Entry(frame)
+		self.startEntry2.grid(row=3,column=2)
+		self.endEntry1 = Entry(frame)
+		self.endEntry1.grid(row=4,column=1)
+		self.endEntry2 = Entry(frame)
+		self.endEntry2.grid(row=4,column=2)
 
 		# Drop down menu 
 		portNumbers = self.serial_ports()
+		portNumbers.append('1')
+		portNumbers.append('2')
+		portNumbers.append('3')
+
 		print(portNumbers)
-		portNum = StringVar(frame)
-		portNum.set("Please select a port")
-		dropPort = OptionMenu(frame, portNum, "one", "two", "three")
+		self.portNum = StringVar(frame)
+		self.portNum.set("Please select a port")
+		dropPort = apply(OptionMenu, (frame, self.portNum) + tuple(portNumbers))
 		dropPort.grid(row=5, column=1, columnspan=2)
 
 		# Camera Menu
-		cameraIndex = StringVar(frame)
-		cameraIndex.set("Please select a port")
-		dropCamera = OptionMenu(frame, cameraIndex, "one", "two", "three")
+		self.cameraIndex = StringVar(frame)
+		self.cameraIndex.set("Please select a port")
+		dropCamera = OptionMenu(frame, self.cameraIndex, "-1", "1", "2")
 		dropCamera.grid(row=6, column=1)
-		camButton = Button(frame, text="Check", command=lambda: self.checkCamera(master), font=("Helvetica", 16))
-		camButton.grid(row=6, column=2)
+		Button(frame, text="Check", font=("Helvetica", 16), command=self.videoLoop).grid(row=6, column=2)#lambda: self.checkCamera(master))
 
 		# Video Capture
 		# img = ImageTk.PhotoImage(Image.open("paintmaze_medium.jpg"))
 		# panel = Label(frame, image = img).grid(row=0, column=3, sticky=N+E+S+W, rowspan=8)
 
 		# Solve Button
-		btnSolve = Button(frame, text="                    Solve!                    ", command=self.grabVariables, font=("Helvetica", 16))
-		btnSolve.grid(row=8, column=0, columnspan=5)
+		Button(frame, text="                    Solve!                    ", command=self.grabVariables, font=("Helvetica", 16)).grid(row=8, column=0, columnspan=5)
 
 		# Grid Sizing
 		frame.columnconfigure(0, weight=1)
@@ -115,11 +106,14 @@ class Gui:
 
 	#	solver = MazeSolver(--image, camIndex, serialPort, playSpaceUpper, playSpaceLower, startUpper, startLower, endUpper, endLower)
 
+	def videoLoop(self):
 
-	def checkCamera(self, frame):
-		print("Is this the camera you want to use?")
-		img = ImageTk.PhotoImage(Image.open("paintmaze_medium.jpg"))
-		panel = Label(frame, image = img).grid(row=0, column=4, sticky=N+E+S+W, rowspan=9)
+		camera = int(self.cameraIndex.get())
+
+	# def checkCamera(self, frame):
+	# 	print("Is this the camera you want to use?")
+	# 	img = ImageTk.PhotoImage(Image.open("paintmaze_medium.jpg"))
+	# 	panel = Label(frame, image = img).grid(row=0, column=4, sticky=N+E+S+W, rowspan=9)
 
 # The following was found at http://stackoverflow.com/questions/12090503/listing-available-com-ports-with-python
 	def serial_ports(self):
@@ -142,24 +136,41 @@ class Gui:
 	            result.append(a_port)
 	        except serial.SerialException:
 	            pass
-	    return result        
+	    return result    
+
+def show_frame(root):
+	vc = cv2.VideoCapture(-1)
+	rval, frame = vc.read()
+	while rval:
+		last_frame = frame.copy()
+
+		cv2img = cv2.cvtColor(last_frame, cv2.COLOR_BGR2RGB)
+		img = Image.fromarray(cv2img)
+		image = ImageTk.PhotoImage(image=img)
+		Label(root, image=image).grid(row=0, column=4, sticky=N+E+S+W)
+
 
 root = Tk()
 root.title("Auto Tilting Ball Maze")
+root.configure(bg="#006666")
 
 # Make fullscreen
 root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
 
 app = Gui(root)
 sw = StopWatch(root)
+sw.configure(bg="#006666")
 sw.grid(row=1, column=4)
 
 Button(root, text='Start', command=sw.Start).grid(row=2, column=4)
 Button(root, text='Stop', command=sw.Stop).grid(row=3, column=4)
 Button(root, text='Reset', command=sw.Reset).grid(row=4, column=4)
 
-img = ImageTk.PhotoImage(Image.open("paintmaze_medium.jpg"))
-Label(root, image = img).grid(row=0, column=4, sticky=N+E+S+W)
+# lmain = Label(root).grid(row=0, column=4, sticky=N+E+S+W)
+# show_frame(root)
+
+# img = ImageTk.PhotoImage(Image.open("paintmaze_medium.jpg"))
+# Label(root, image = img).grid(row=0, column=4, sticky=N+E+S+W)
 
 tkMessageBox.showinfo("Step 1", "Please manually level the play surface . . .")
 root.mainloop()
