@@ -99,13 +99,9 @@ class MazeSolver(object):
             self._current_image = cv2.imread(self.fixed_image_path)
 
         # Run initial image processing
-        mazenodes = MazeNodes(self._current_image)
-        mazenodes.end_lower = self.end_colour_lower
-        mazenodes.end_upper = self.end_colour_upper
-        mazenodes.start_lower = self.start_colour_lower
-        mazenodes.start_upper = self.start_colour_upper
-        mazenodes.play_lower = self.play_colour_lower
-        mazenodes.play_upper = self.play_colour_upper
+        mazenodes = MazeNodes(self._current_image, self.end_colour_lower, self.end_colour_upper,
+                                self.start_colour_lower, self.start_colour_upper,
+                                  self.play_colour_lower, self.play_colour_upper)
         mazenodes.runProcessing()
 
         nodes = mazenodes.nodes

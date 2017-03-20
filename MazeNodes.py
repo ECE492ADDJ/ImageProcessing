@@ -42,19 +42,21 @@ class MazeNodes:
     Take an image and convert it into nodes and edges for pathfinding
     """
 
-    def __init__(self, image):
+    def __init__(self, image, end_thresh_low, end_thresh_high,
+                                start_thresh_low, start_thresh_high,
+                                  play_thresh_low, play_thresh_high):
         self.image = image
 
         self.nodes = {}
         self.end = Node()
         self.start = Node()
 
-        self.end_lower = [0, 0, 150]
-        self.end_upper = [140, 140, 255]
-        self.start_lower = [0, 175, 0]
-        self.start_upper = [160, 255, 160]
-        self.play_lower = [200, 200, 200]
-        self.play_upper = [255, 255, 255]
+        self.end_lower = end_thresh_low
+        self.end_upper = end_thresh_high
+        self.start_lower = start_thresh_low
+        self.start_upper = start_thresh_high
+        self.play_lower = play_thresh_low
+        self.play_upper = play_thresh_high
 
         # rayryeng, http://stackoverflow.com/questions/30369031/remove-spurious-small-islands-of-noise-in-an-image-python-opencv, 2017-03-16
         self.filt_small = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
