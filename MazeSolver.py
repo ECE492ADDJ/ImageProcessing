@@ -122,7 +122,8 @@ class MazeSolver(object):
             img.drawResults(self._current_image, nodes, self._path, start_node, end_node)
         else:
             # Live ball tracking
-            ball_finder = FindBall(mazenodes.start_lower, mazenodes.start_upper)
+            ball_finder = FindBall(mazenodes.start_lower, mazenodes.start_upper,
+                    mazenodes.filt_close, mazenodes.filt_open)
             planner = BallPathPlanner(self.path)
             # TODO: Allow planner speed, latency, acceleration factor, etc to be set a runtime.
             # Possibly through a config file?
@@ -138,7 +139,7 @@ class MazeSolver(object):
                     if not retval:
                         raise IOError("Failed to read image from camera.")
 
-                    ball_x, ball_y = ball_finder.findBall(self._current_image, mazenodes.filt_small, mazenodes.filt_large)
+                    ball_x, ball_y = ball_finder.findBall(self._current_image)
                     acc_x, acc_y = planner.getAcceleration(ball_x, ball_y)
 
                     # Check connection
