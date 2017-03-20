@@ -99,13 +99,9 @@ class MazeSolver(object):
             self._current_image = cv2.imread(self.fixed_image_path)
 
         # Run initial image processing
-        mazenodes = MazeNodes(self._current_image)
-        mazenodes.end_lower = self.end_colour_lower
-        mazenodes.end_upper = self.end_colour_upper
-        mazenodes.start_lower = self.start_colour_lower
-        mazenodes.start_upper = self.start_colour_upper
-        mazenodes.play_lower = self.play_colour_lower
-        mazenodes.play_upper = self.play_colour_upper
+        mazenodes = MazeNodes(self._current_image, self.end_colour_lower, self.end_colour_upper,
+                                self.start_colour_lower, self.start_colour_upper,
+                                  self.play_colour_lower, self.play_colour_upper)
         mazenodes.runProcessing()
 
         nodes = mazenodes.nodes
@@ -126,7 +122,8 @@ class MazeSolver(object):
             img.drawResults(self._current_image, nodes, self._path, start_node, end_node)
         else:
             # Live ball tracking
-            ball_finder = FindBall(mazenodes.start_lower, mazenodes.start_upper)
+            ball_finder = FindBall(mazenodes.start_lower, mazenodes.start_upper,
+                    mazenodes.filt_close, mazenodes.filt_open)
             planner = BallPathPlanner(self.path)
             # TODO: Allow planner speed, latency, acceleration factor, etc to be set a runtime.
             # Possibly through a config file?
@@ -142,7 +139,7 @@ class MazeSolver(object):
                     if not retval:
                         raise IOError("Failed to read image from camera.")
 
-                    ball_x, ball_y = ball_finder.findBall(self._current_image, mazenodes.filt_small, mazenodes.filt_large)
+                    ball_x, ball_y = ball_finder.findBall(self._current_image)
                     acc_x, acc_y = planner.getAcceleration(ball_x, ball_y)
 
                     # Check connection

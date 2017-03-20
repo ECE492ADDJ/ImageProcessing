@@ -8,7 +8,7 @@ Description:    Allows you to control servos over serial port
 import serial
 import sys
 import re
-import SerialException
+from SerialException import SerialException, NoResponseException, InvalidResponseException
 
 class ServoConnection:
 	# A better solution could be implemented by creating a class for commands,

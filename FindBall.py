@@ -30,20 +30,25 @@ from ImageProcessingFunctions import *
 
 class FindBall:
 
-    def __init__(self, start_lower, start_upper):
+    def __init__(self, start_lower, start_upper,
+            filt_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5)),
+            filt_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2,2))):
         # Get variables calculated in MazeNodes
         self.thresh_lower = np.array(start_lower, dtype="uint8")
         self.thresh_upper = np.array(start_upper, dtype="uint8")
 
+        self.filt_close = filt_close
+        self.filt_open = filt_open
+
         self.ball_history = []
 
-    def findBall(self, image, filt_small, filt_large):
+    def findBall(self, image):
         """
         Determine current location of ball (center pixel location) in an image of the maze
         """
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
         ball_mask = cv2.inRange(image, self.thresh_lower, self.thresh_upper) # find ball
-        ball_x, ball_y = findRegionCenter(ball_mask, filt_small, filt_large)
+        ball_x, ball_y = findRegionCenter(ball_mask, self.filt_close, self.filt_open)
 
         self.ball_history.append(((ball_x, ball_y), time.clock())) # save position and time found at
 
