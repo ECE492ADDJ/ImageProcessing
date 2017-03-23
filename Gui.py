@@ -8,16 +8,15 @@ Description:    Gui for entire project
 """
 
 from Tkinter import *
-# from MazeSolver import MazeSolver
+from MazeSolver import MazeSolver
 from PIL import Image, ImageTk
 from StopWatch import StopWatch
 import cv2
 import numpy as np
-import tkMessageBox
-import tkFileDialog
 import sys
 import glob
 import serial
+
 
 class Gui:
 
@@ -25,7 +24,6 @@ class Gui:
 
 		frame = Frame(master, bg="#006666")
 		frame.grid(row=0, column=0, rowspan=1, columnspan=1)
-		# frame.pack(fill=BOTH)
 
 		# Labels
 		Label(frame, text="Please Enter Variables", font=("Helvetica", 18), bg="#006666").grid(row=0, columnspan=3)
@@ -64,16 +62,18 @@ class Gui:
 		dropPort = apply(OptionMenu, (frame, self.portNum) + tuple(portNumbers))
 		dropPort.grid(row=5, column=1, columnspan=2)
 
-		# Camera Menu
+		# Camera Menu		
+		indexes = self.detectNumCameras()
+		print(indexes)
+		camIndex = []
+		for n in xrange(indexes):
+			camIndex.append(n)
+
 		self.cameraIndex = StringVar(frame)
 		self.cameraIndex.set("Please select a port")
-		dropCamera = OptionMenu(frame, self.cameraIndex, "-1", "1", "2")
+		dropCamera = apply(OptionMenu, (frame, self.cameraIndex) + tuple(camIndex))
 		dropCamera.grid(row=6, column=1)
-		Button(frame, text="Check", font=("Helvetica", 16), command=self.videoLoop).grid(row=6, column=2)#lambda: self.checkCamera(master))
-
-		# Video Capture
-		# img = ImageTk.PhotoImage(Image.open("paintmaze_medium.jpg"))
-		# panel = Label(frame, image = img).grid(row=0, column=3, sticky=N+E+S+W, rowspan=8)
+		Button(frame, text="Check", font=("Helvetica", 16)).grid(row=6, column=2)#lambda: self.checkCamera(master))  , command=self.videoLoop
 
 		# Solve Button
 		Button(frame, text="                    Solve!                    ", command=self.grabVariables, font=("Helvetica", 16)).grid(row=8, column=0, columnspan=5)
@@ -104,26 +104,9 @@ class Gui:
 		serialPort = self.portNum.get()
 		camIndex = self.cameraIndex.get()
 
-	#	solver = MazeSolver(--image, camIndex, serialPort, playSpaceUpper, playSpaceLower, startUpper, startLower, endUpper, endLower)
+		# solver = MazeSolver()
 
-	def videoLoop(self):
-
-		camera = int(self.cameraIndex.get())
-
-	# def checkCamera(self, frame):
-	# 	print("Is this the camera you want to use?")
-	# 	img = ImageTk.PhotoImage(Image.open("paintmaze_medium.jpg"))
-	# 	panel = Label(frame, image = img).grid(row=0, column=4, sticky=N+E+S+W, rowspan=9)
-
-# The following was found at http://stackoverflow.com/questions/12090503/listing-available-com-ports-with-python
 	def serial_ports(self):
-	    """ Lists serial port names
-
-	        :raises EnvironmentError:
-	            On unsupported or unknown platforms
-	        :returns:
-	            A list of the serial ports available on the system
-	    """
 	    if sys.platform.startswith('win'):
 	        ports = ['COM%s' % (i + 1) for i in range(256)]
 	    elif sys.platform.startswith ('linux'):
@@ -136,41 +119,19 @@ class Gui:
 	            result.append(a_port)
 	        except serial.SerialException:
 	            pass
-	    return result    
-
-def show_frame(root):
-	vc = cv2.VideoCapture(-1)
-	rval, frame = vc.read()
-	while rval:
-		last_frame = frame.copy()
-
-		cv2img = cv2.cvtColor(last_frame, cv2.COLOR_BGR2RGB)
-		img = Image.fromarray(cv2img)
-		image = ImageTk.PhotoImage(image=img)
-		Label(root, image=image).grid(row=0, column=4, sticky=N+E+S+W)
+	    return result  
 
 
-root = Tk()
-root.title("Auto Tilting Ball Maze")
-root.configure(bg="#006666")
+	def detectNumCameras(self):
+		
+		ind = 0
+		# Iterates through indexes until we cant find a camera
+		while True:
+		    vc = cv2.VideoCapture(ind)
+		    if (vc.isOpened()):
+		    	ind += 1
+		        vc.release()
+		    else:
+		    	break
 
-# Make fullscreen
-root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
-
-app = Gui(root)
-sw = StopWatch(root)
-sw.configure(bg="#006666")
-sw.grid(row=1, column=4)
-
-Button(root, text='Start', command=sw.Start).grid(row=2, column=4)
-Button(root, text='Stop', command=sw.Stop).grid(row=3, column=4)
-Button(root, text='Reset', command=sw.Reset).grid(row=4, column=4)
-
-# lmain = Label(root).grid(row=0, column=4, sticky=N+E+S+W)
-# show_frame(root)
-
-# img = ImageTk.PhotoImage(Image.open("paintmaze_medium.jpg"))
-# Label(root, image = img).grid(row=0, column=4, sticky=N+E+S+W)
-
-tkMessageBox.showinfo("Step 1", "Please manually level the play surface . . .")
-root.mainloop()
+		return ind
