@@ -8,15 +8,11 @@ Description:    Overhead code to call the Gui and other classes used
 """
 
 from Tkinter import *
-from imutils.video import VideoStream
 from StopWatch import StopWatch
-from Gui import Gui
-from VideoThread import VideoThread
 from PIL import Image, ImageTk
 from StopWatch import StopWatch
 import tkMessageBox
 import cv2
-import numpy as np
 import sys
 import glob
 import serial
@@ -176,14 +172,6 @@ Button(root, text='Start', command=sw.Start).grid(row=7, column=4, sticky=S)
 Button(root, text='Stop', command=sw.Stop).grid(row=8, column=4)
 Button(root, text='Reset', command=sw.Reset).grid(row=9, column=4, sticky=N)
 
-# vc = VideoStream(usePiCamera=0).start()
-# vt = VideoThread(vc)
-
-# lmain = Label(root).grid(row=0, column=4, sticky=N+E+S+W)
-# show_root(root)
-
-# img = ImageTk.PhotoImage(Image.open("paintmaze_medium.jpg"))
-# Label(root, image = img).grid(row=0, column=4, sticky=N+E+S+W, rowspan = 8)
-
+# Info box reminder to level the playing surface
 tkMessageBox.showinfo("Step 1", "Please manually level the play surface . . .")
 root.mainloop()
