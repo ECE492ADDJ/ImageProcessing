@@ -23,8 +23,9 @@ from ServoController import ServoConnection
 from SerialException import SerialException
 
 # TODO: Allow these values to be changed at runtime.
-MAX_ACC = 65535
+MAX_ACC = 32768
 FRAMERATE = 30
+ACC_MULTIPLIER = 5000
 
 class MazeSolver(object):
     """
@@ -133,6 +134,9 @@ class MazeSolver(object):
                 flat_x = conn.get_x_val()
                 flat_y = conn.get_y_val()
 
+                relative_max_x = min(abs(-1 * MAX_ACC - flat_x), MAX_ACC - flat_x)
+                relative_max_y = min(abs(-1 * MAX_ACC - flat_y), MAX_ACC - flat_y)
+
                 while not planner.isFinished():
                     start_time = time.clock()
                     retval, self._current_image = camera.read()
@@ -144,8 +148,8 @@ class MazeSolver(object):
 
                     # Check connection
                     if conn.is_connected():
-                        new_x_acc = max(0, min(MAX_ACC, int((MAX_ACC / 2) * (acc_x + 1))))
-                        new_y_acc = max(0, min(MAX_ACC, int((MAX_ACC / 2) * (acc_y + 1))))
+                        new_x_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_x * ACC_MULTIPLIER + flat_x))
+                        new_y_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_y * ACC_MULTIPLIER + flat_y))
                         conn.set_x_val(new_x_acc)
                         conn.set_y_val(new_y_acc)
                     else:

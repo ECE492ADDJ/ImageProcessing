@@ -60,7 +60,7 @@ class ServoConnection:
 		if match is None:
 			raise InvalidResponseException("Argument not found in GETX response.")
 
-		return int(match.group(1), 16)
+		return twos_comp(int(match.group(1), 16), 16)
 
 	def get_y_val(self):
 		if not self.serconn.is_open:
@@ -77,7 +77,7 @@ class ServoConnection:
 		if match is None:
 			raise InvalidResponseException("Argument not found in GETY response.")
 
-		return int(match.group(1), 16)
+		return twos_comp(int(match.group(1), 16), 16)
 
 	def set_x_val(self, val):
 		if not self.serconn.is_open:
@@ -171,3 +171,11 @@ if __name__ == '__main__':
 					continue
 			else:
 				print "Invalid command; try testconn, setx, sety, getx, or gety."
+
+
+# Source: http://stackoverflow.com/a/9147327
+def twos_comp(val, bits):
+    """compute the 2's compliment of int value val"""
+    if (val & (1 << (bits - 1))) != 0: # if sign bit is set e.g., 8bit: 128-255
+        val = val - (1 << bits)        # compute negative value
+    return val                         # return positive value as is
