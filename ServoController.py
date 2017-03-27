@@ -25,8 +25,8 @@ class ServoConnection:
 	__CMD_GETX = "GX"
 	__CMD_GETY = "GY"
 
-	def __init__(self, port='/dev/ttyS0', timeout=0.05):
-		self.serconn = serial.Serial(port, 57600, timeout=timeout)
+	def __init__(self, port='/dev/ttyUSB0', timeout=0.05):
+		self.serconn = serial.Serial(port, 115200, timeout=timeout)
 
 	def __enter__(self):
 		return self

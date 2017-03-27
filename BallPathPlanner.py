@@ -59,24 +59,32 @@ class BallPathPlanner(object):
             self._finished = True
             return (0, 0)
 
-        curr = time.clock()
-        if self._last_time is None:
-            vel = (0, 0)
-        else:
-            vel = ((ball_x - self._last_x) / (curr - self._last_time),
-                    (ball_y - self._last_y) / (curr - self._last_time))
+        desired_x, desired_y = self._nodes[self._current_node_index].coordinates
 
-        expected_ball_x = ball_x + vel[0] * self.latency
-        expected_ball_y = ball_y + vel[1] * self.latency
+        acc = (desired_x - ball_x, desired_y - ball_y)
 
-        desired_vel = self._calculateVelocity(expected_ball_x,
-                                        expected_ball_y, self._current_node_index)
+        # curr = time.clock()
+        # if self._last_time is None:
+        #     vel = (0, 0)
+        # else:
+        #     vel = ((ball_x - self._last_x), #/ (curr - self._last_time),
+        #             (ball_y - self._last_y)) #/ (curr - self._last_time))
 
-        if self._last_time is None:
-            acc = (desired_vel[0], desired_vel[1])
-        else:
-            dt = curr - self._last_time
-            acc = ((desired_vel[0] - vel[0]) / dt, (desired_vel[1] - vel[1]) / dt)
+        # expected_ball_x = ball_x + vel[0] * self.latency
+        # expected_ball_y = ball_y + vel[1] * self.latency
+
+        # desired_vel = self._calculateVelocity(expected_ball_x,
+        #                                 expected_ball_y, self._current_node_index)
+
+        # print "Current vel: x: {0} y: {1}".format(vel[0], vel[1])
+        # print "Desired vel: x: {0}, y: {1}".format(desired_vel[0], desired_vel[1])
+
+        # if self._last_time is None:
+        #     acc = (desired_vel[0], desired_vel[1])
+        # else:
+        #     dt = 1#curr - self._last_time
+        #     print "dt: {0}".format(dt)
+        #     acc = ((desired_vel[0] - vel[0]) / dt, (desired_vel[1] - vel[1]) / dt)
 
         currentnode = self._nodes[self._current_node_index]
         dx = ball_x - currentnode.coordinates[0]
@@ -85,9 +93,9 @@ class BallPathPlanner(object):
         if sqrt(dx * dx + dy * dy) <= self.proxThreshold:
             self._current_node_index += 1
 
-        self._last_x = ball_x
-        self._last_y = ball_y
-        self._last_time = time.clock()
+        # self._last_x = ball_x
+        # self._last_y = ball_y
+        # self._last_time = time.clock()
         return acc
 
     def isFinished(self):

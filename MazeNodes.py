@@ -98,20 +98,30 @@ class MazeNodes:
         # Find endone and white it out
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
         end_mask = cv2.inRange(self.image, end_lower_np, end_upper_np) # find endzone area
+        cv2.imshow("image", end_mask)
+        cv2.waitKey(0)
         self.findEnd(end_mask)
         self.image[np.where(end_mask == [255])] = 255 # white out endzone
 
         # Find start (ball) and white it out
         start_mask = cv2.inRange(self.image, start_lower_np, start_upper_np) # find ball (start)
+        cv2.imshow("image", start_mask)
+        cv2.waitKey(0)
         self.findStart(start_mask)
         self.image[np.where(start_mask == [255])] = 255 # white out ball
 
         mask = cv2.inRange(self.image, play_lower_np, play_upper_np) # find white (playing) area
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.filt_close)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.filt_open)
+        cv2.imshow("image", mask)
+        cv2.waitKey(0)
         self.image[np.where(mask == [255])] = 255 # white out white
         self.image[np.where(mask != [255])] = 0 # white out white
 
         # Determine the grid size based on path thickness
-        path_width, path_height = self._getPathThickness(mask)
+        #path_width, path_height = self._getPathThickness(mask)
+        path_width = 20
+        path_height = 20
         self.x_div_count = int(len(self.image[0]) / (path_width / (self.nodes_per_path + 1)))
         self.y_div_count = int(len(self.image) / (path_height / (self.nodes_per_path + 1)))
         self.x_div_len = int(len(self.image[0]) / self.x_div_count)
@@ -144,7 +154,7 @@ class MazeNodes:
         try:
             end_X, end_Y = findRegionCenter(end_mask, self.filt_open, self.filt_close)
         except:
-            raise ValueError("Image has no start colour region")
+            raise ValueError("Image has no end colour region")
         self.end.coordinates = (end_X, end_Y)
         self.end.neighbours = []
         self.end.start = False

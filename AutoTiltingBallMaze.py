@@ -13,6 +13,7 @@ from PIL import Image, ImageTk
 from StopWatch import StopWatch
 from serial.tools import list_ports
 from MazeSolver import MazeSolver
+# from MazeSolver import parseThreshold
 import serial
 import tkMessageBox
 import cv2
@@ -44,16 +45,22 @@ class AutoTiltingBallMaze:
 
 		# Text Fields
 		self.playSpaceEntry1 = Entry(root)
+		self.playSpaceEntry1.insert(END, "255,255,255")
 		self.playSpaceEntry1.grid(row=2,column=1)
 		self.playSpaceEntry2 = Entry(root)
+		self.playSpaceEntry2.insert(END, "100,100,100")
 		self.playSpaceEntry2.grid(row=2,column=2)
 		self.startEntry1 = Entry(root)
+		self.startEntry1.insert(END, "255,135,35")
 		self.startEntry1.grid(row=3,column=1)
 		self.startEntry2 = Entry(root)
+		self.startEntry2.insert(END, "70,0,0")
 		self.startEntry2.grid(row=3,column=2)
 		self.endEntry1 = Entry(root)
+		self.endEntry1.insert(END, "235,135,255")
 		self.endEntry1.grid(row=4,column=1)
 		self.endEntry2 = Entry(root)
+		self.endEntry2.insert(END, "150,70,190")
 		self.endEntry2.grid(row=4,column=2)
 
 		# Get all available serial ports
@@ -78,7 +85,7 @@ class AutoTiltingBallMaze:
 		self.cameraIndex.set("Please select a camera")
 		dropCamera = apply(OptionMenu, (root, self.cameraIndex) + tuple(camIndex))
 		dropCamera.grid(row=6, column=1)
-		Button(root, text="Check", font=("Helvetica", 16), command=self.checkCamera).grid(row=6, column=2)#lambda: checkCamera(master))
+		Button(root, text="Check", font=("Helvetica", 16), command=lambda: self.checkCamera(root)).grid(row=6, column=2)#lambda: checkCamera(master))
 
 		# Solve Button
 		Button(root, text="                    Solve!                    ", command=self.grabVariables, font=("Helvetica", 16)).grid(row=8, column=0, columnspan=3, rowspan=2)
@@ -119,6 +126,7 @@ class AutoTiltingBallMaze:
 		root.mainloop()
 
 
+	#show_frame insprired by http://stackoverflow.com/questions/16366857/show-webcam-sequence-tkinter
 	def show_frame(self):
 		_, frame = self.cap.read()
 		frame = cv2.flip(frame, 1)
@@ -131,7 +139,10 @@ class AutoTiltingBallMaze:
 
 
 	def grabVariables(self):
+
 		playSpaceUpper = self.playSpaceEntry1.get()
+		if self.playSpaceEntry1.get():
+			print("here")
 		playSpaceLower = self.playSpaceEntry2.get()
 		startUpper = self.startEntry1.get()
 		startLower = self.startEntry2.get()
@@ -140,9 +151,30 @@ class AutoTiltingBallMaze:
 		serialPort = self.portNum.get()
 		camIndex = self.cameraIndex.get()
 
-		self.cap.release()
+		# Parse our inputs for MazeSolver input
+		playSpaceLower = self.parseThreshold(playSpaceLower)
+		playSpaceUpper = self.parseThreshold(playSpaceUpper)
+		startUpper = self.parseThreshold(startUpper)
+		startLower = self.parseThreshold(startLower)
+		endUpper = self.parseThreshold(endUpper)
+		endLower = self.parseThreshold(endLower)
 
 		solver = MazeSolver()
+
+		# The following values have defaults if not set
+		solver.play_colour_lower = playSpaceLower
+		solver.play_colour_upper = playSpaceUpper
+		solver.start_colour_upper = startUpper
+		solver.start_colour_lower = startLower
+		solver.end_colour_upper = endUpper
+		solver.end_colour_lower = endLower
+		solver.serial_port = serialPort
+		print("\n")
+		print(serialPort)
+		solver.camera_index = int(camIndex)
+
+		# self.cap.release()
+
 		solver.run()
 
 
@@ -164,15 +196,16 @@ class AutoTiltingBallMaze:
 		return ind
 
 
-	def checkCamera(self):
+	def checkCamera(self, root):
 
 		try:
 			self.cap.release()
+			print("released")
 		except:
 			pass
 
-		self.cap = cv2.VideoCapture(int(self.cameraIndex.get()))
-		
+		self.cap = cv2.VideoCapture(int(self.cameraIndex.get()))		
+
 		_, frame = self.cap.read()
 		frame = cv2.flip(frame, 1)
 		cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
@@ -181,6 +214,10 @@ class AutoTiltingBallMaze:
 		self.lmain.imgtk = imgtk
 		self.lmain.configure(image=imgtk)
 		self.lmain.after(10, self.show_frame) 
+
+	def parseThreshold(self, values):
+		strings = values.split(",")
+		return [int(string) for string in strings]
 
 
 AutoTiltingBallMaze()

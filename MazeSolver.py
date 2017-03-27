@@ -23,9 +23,9 @@ from ServoController import ServoConnection
 from SerialException import SerialException
 
 # TODO: Allow these values to be changed at runtime.
-MAX_ACC = 32768
-FRAMERATE = 30
-ACC_MULTIPLIER = 5000
+MAX_ACC = 150
+FRAMERATE = 5
+ACC_MULTIPLIER = 5
 
 class MazeSolver(object):
     """
@@ -70,8 +70,8 @@ class MazeSolver(object):
         self.end_colour_upper = [140, 140, 255]
         self.end_colour_lower = [0, 0, 150]
 
-        self.serial_port = '/dev/ttyS0'
-        self.camera_index = 0
+        self.serial_port = '/dev/ttyUSB0'
+        self.camera_index = 1
         self.fixed_image_path = None
 
         self.update_callback = lambda ms: None
@@ -125,10 +125,11 @@ class MazeSolver(object):
             # Live ball tracking
             ball_finder = FindBall(mazenodes.start_lower, mazenodes.start_upper,
                     mazenodes.filt_close, mazenodes.filt_open)
-            planner = BallPathPlanner(self.path)
+            planner = BallPathPlanner(self._path)
             # TODO: Allow planner speed, latency, acceleration factor, etc to be set a runtime.
             # Possibly through a config file?
-            planner.speed = 25
+            planner.speed = 1
+            planner.latency = 0
 
             with ServoConnection(port=self.serial_port) as conn:
                 flat_x = conn.get_x_val()
@@ -144,16 +145,24 @@ class MazeSolver(object):
                         raise IOError("Failed to read image from camera.")
 
                     ball_x, ball_y = ball_finder.findBall(self._current_image)
-                    acc_x, acc_y = planner.getAcceleration(ball_x, ball_y)
 
-                    # Check connection
-                    if conn.is_connected():
-                        new_x_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_x * ACC_MULTIPLIER + flat_x))
-                        new_y_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_y * ACC_MULTIPLIER + flat_y))
-                        conn.set_x_val(new_x_acc)
-                        conn.set_y_val(new_y_acc)
-                    else:
-                        raise SerialException("Lost connection to board.")
+                    print "Ball: x: {0}, y: {1}".format(ball_x, ball_y)
+                    acc_x, acc_y = planner.getAcceleration(ball_x, ball_y)
+                    print "Acc: x: {0}, y: {1}".format(acc_x, acc_y)
+
+                    try:
+                        # Check connection
+                        if conn.is_connected():
+                            new_x_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_x * ACC_MULTIPLIER + flat_x))
+                            new_y_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_y * ACC_MULTIPLIER + flat_y))
+                            conn.set_x_val(new_x_acc)
+                            conn.set_y_val(new_y_acc)
+
+                        else:
+                            raise SerialException("Lost connection to board.")
+
+                    except SerialException as e:
+                        print(e)
 
                     self.update_callback(self)
 
