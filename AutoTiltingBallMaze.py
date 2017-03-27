@@ -75,7 +75,7 @@ class AutoTiltingBallMaze:
 
 		# Camera Menu		
 		self.cameraIndex = StringVar(root)
-		self.cameraIndex.set(0)
+		self.cameraIndex.set("Please select a camera")
 		dropCamera = apply(OptionMenu, (root, self.cameraIndex) + tuple(camIndex))
 		dropCamera.grid(row=6, column=1)
 		Button(root, text="Check", font=("Helvetica", 16), command=self.checkCamera).grid(row=6, column=2)#lambda: checkCamera(master))
@@ -88,7 +88,6 @@ class AutoTiltingBallMaze:
 		imageFrame.grid(row=0, column=4, rowspan=8)
 		self.lmain = Label(imageFrame)
 		self.lmain.grid(row=0, column=0)
-		self.checkCamera()
 
 		# Grid Sizing
 		root.columnconfigure(0, weight=1)
