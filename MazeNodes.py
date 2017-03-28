@@ -255,7 +255,8 @@ class MazeNodes:
 
         for pixel in pixels:
             if pixel == 0 and prevpixel != 0:
-                mincount = min([count, mincount, self.min_path_thickness])
+                if count >= self.min_path_thickness:
+                    mincount = min(count, mincount)
                 count = 0
             elif pixel == 255:
                 count += 1
@@ -263,7 +264,8 @@ class MazeNodes:
             prevpixel = pixel
 
         if prevpixel != 0:
-            mincount = min([count, mincount, self.min_path_thickness])
+            if count >= self.min_path_thickness:
+                mincount = min(count, mincount)
 
         return mincount
 
