@@ -23,9 +23,9 @@ from ServoController import ServoConnection
 from SerialException import SerialException
 
 # TODO: Allow these values to be changed at runtime.
-MAX_ACC = 32768
-FRAMERATE = 30
-ACC_MULTIPLIER = 5000
+MAX_ACC = 100
+FRAMERATE = 2
+ACC_MULTIPLIER = 2
 
 class MazeSolver(object):
     """
@@ -118,6 +118,8 @@ class MazeSolver(object):
         pathfinder = PathFinder(nodes, start_node, end_node)
         self._path = pathfinder.findPath()
 
+        img.drawResults(self._current_image, nodes, self._path, start_node, end_node)
+
         if not self.fixed_image_path is None:
             # Debug: draw result of pathfinding
             img.drawResults(self._current_image, nodes, self._path, start_node, end_node)
@@ -125,10 +127,10 @@ class MazeSolver(object):
             # Live ball tracking
             ball_finder = FindBall(mazenodes.start_lower, mazenodes.start_upper,
                     mazenodes.filt_close, mazenodes.filt_open)
-            planner = BallPathPlanner(self.path)
+            planner = BallPathPlanner(self._path)
             # TODO: Allow planner speed, latency, acceleration factor, etc to be set a runtime.
             # Possibly through a config file?
-            planner.speed = 25
+            planner.speed = 50
 
             with ServoConnection(port=self.serial_port) as conn:
                 flat_x = conn.get_x_val()
@@ -146,18 +148,17 @@ class MazeSolver(object):
                     ball_x, ball_y = ball_finder.findBall(self._current_image)
                     acc_x, acc_y = planner.getAcceleration(ball_x, ball_y)
 
-                    # Check connection
-                    if conn.is_connected():
+                    try:
                         new_x_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_x * ACC_MULTIPLIER + flat_x))
                         new_y_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_y * ACC_MULTIPLIER + flat_y))
                         conn.set_x_val(new_x_acc)
                         conn.set_y_val(new_y_acc)
-                    else:
-                        raise SerialException("Lost connection to board.")
+                    except SerialException as ex:
+                        print ex
 
                     self.update_callback(self)
 
-                    time.sleep(1.0 / FRAMERATE - (time.clock() - start_time))
+                    time.sleep(max(1.0 / FRAMERATE - (time.clock() - start_time), 0))
 
                 self._finished = planner.isFinished()
 

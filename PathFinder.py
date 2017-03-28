@@ -68,7 +68,7 @@ class PathFinder:
 
         path = self.shortestPath(graph, self.startNode, self.endNode)
 
-        sp = self.reduceNodes(path)
+        #sp = self.reduceNodes(path)
 
         return path
 
