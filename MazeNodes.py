@@ -101,14 +101,25 @@ class MazeNodes:
         self.findEnd(end_mask)
         self.image[np.where(end_mask == [255])] = 255 # white out endzone
 
+        cv2.imshow("End Mask", end_mask)
+        cv2.waitKey(0)
+
         # Find start (ball) and white it out
         start_mask = cv2.inRange(self.image, start_lower_np, start_upper_np) # find ball (start)
         self.findStart(start_mask)
         self.image[np.where(start_mask == [255])] = 255 # white out ball
 
+        cv2.imshow("Start Mask", start_mask)
+        cv2.waitKey(0)
+
         mask = cv2.inRange(self.image, play_lower_np, play_upper_np) # find white (playing) area
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.filt_close)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.filt_open)
         self.image[np.where(mask == [255])] = 255 # white out white
         self.image[np.where(mask != [255])] = 0 # white out white
+
+        cv2.imshow("Play Mask", mask)
+        cv2.waitKey(0)
 
         # Determine the grid size based on path thickness
         path_width, path_height = self._getPathThickness(mask)
@@ -144,7 +155,7 @@ class MazeNodes:
         try:
             end_X, end_Y = findRegionCenter(end_mask, self.filt_open, self.filt_close)
         except:
-            raise ValueError("Image has no start colour region")
+            raise ValueError("Image has no end colour region")
         self.end.coordinates = (end_X, end_Y)
         self.end.neighbours = []
         self.end.start = False
@@ -244,7 +255,7 @@ class MazeNodes:
 
         for pixel in pixels:
             if pixel == 0 and prevpixel != 0:
-                mincount = min(count, mincount)
+                mincount = min([count, mincount, self.min_path_thickness])
                 count = 0
             elif pixel == 255:
                 count += 1
@@ -252,7 +263,7 @@ class MazeNodes:
             prevpixel = pixel
 
         if prevpixel != 0:
-            mincount = min(count, mincount)
+            mincount = min([count, mincount, self.min_path_thickness])
 
         return mincount
 
