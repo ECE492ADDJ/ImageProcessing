@@ -68,7 +68,7 @@ class MazeNodes:
         self.x_div_count = None
         self.y_div_count = None
 
-        self.min_path_thickness = 10
+        self.min_path_thickness = 30
         self.scan_interval = 20
         self.nodes_per_path = 3
 
