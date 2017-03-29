@@ -85,7 +85,7 @@ class AutoTiltingBallMaze:
 		self.cameraIndex.set("Please select a camera")
 		dropCamera = apply(OptionMenu, (root, self.cameraIndex) + tuple(camIndex))
 		dropCamera.grid(row=6, column=1)
-		Button(root, text="Check", font=("Helvetica", 16), command=lambda: self.checkCamera(root)).grid(row=6, column=2)#lambda: checkCamera(master))
+		Button(root, text="Check", font=("Helvetica", 16), command=self.checkCamera).grid(row=6, column=2)#lambda: checkCamera(master))
 
 		# Solve Button
 		Button(root, text="                    Solve!                    ", command=self.grabVariables, font=("Helvetica", 16)).grid(row=8, column=0, columnspan=3, rowspan=2)
@@ -141,8 +141,6 @@ class AutoTiltingBallMaze:
 	def grabVariables(self):
 
 		playSpaceUpper = self.playSpaceEntry1.get()
-		if self.playSpaceEntry1.get():
-			print("here")
 		playSpaceLower = self.playSpaceEntry2.get()
 		startUpper = self.startEntry1.get()
 		startLower = self.startEntry2.get()
@@ -168,12 +166,10 @@ class AutoTiltingBallMaze:
 		solver.start_colour_lower = startLower
 		solver.end_colour_upper = endUpper
 		solver.end_colour_lower = endLower
-		solver.serial_port = serialPort
-		print("\n")
-		print(serialPort)
+		# solver.serial_port = serialPort
 		solver.camera_index = int(camIndex)
 
-		# self.cap.release()
+		self.cap.release()
 
 		solver.run()
 
@@ -196,15 +192,14 @@ class AutoTiltingBallMaze:
 		return ind
 
 
-	def checkCamera(self, root):
+	def checkCamera(self):
 
 		try:
 			self.cap.release()
-			print("released")
 		except:
 			pass
 
-		self.cap = cv2.VideoCapture(int(self.cameraIndex.get()))		
+		self.cap = cv2.VideoCapture(int(self.cameraIndex.get()))
 
 		_, frame = self.cap.read()
 		frame = cv2.flip(frame, 1)
@@ -218,6 +213,5 @@ class AutoTiltingBallMaze:
 	def parseThreshold(self, values):
 		strings = values.split(",")
 		return [int(string) for string in strings]
-
 
 AutoTiltingBallMaze()
