@@ -25,7 +25,7 @@ class ServoConnection:
     __CMD_GETX = "GX"
     __CMD_GETY = "GY"
 
-    def __init__(self, port='/dev/ttyS0', timeout=0.05):
+    def __init__(self, port='/dev/ttyUSB0', timeout=0.05):
         self.serconn = serial.Serial(port, 57600, timeout=timeout)
 
     def __enter__(self):
@@ -111,7 +111,7 @@ class ServoConnection:
 
 
 if __name__ == '__main__':
-    with ServoConnection("COM3") as conn:
+    with ServoConnection() as conn:
         while(True):
             text = raw_input("Enter command: ")
 

@@ -70,7 +70,7 @@ class MazeSolver(object):
         self.end_colour_upper = [140, 140, 255]
         self.end_colour_lower = [0, 0, 150]
 
-        self.serial_port = '/dev/ttyS0'
+        self.serial_port = '/dev/ttyUSB0'
         self.camera_index = 0
         self.fixed_image_path = None
 

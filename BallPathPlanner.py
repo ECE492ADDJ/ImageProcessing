@@ -36,7 +36,7 @@ class BallPathPlanner(object):
         self.weightingFactor = 0.7
         self.speed = 5
         self.proxThreshold = 10
-        self.latency = 0.005
+        self.latency = 0.01
 
         self._finished = False
         self._last_x = None
