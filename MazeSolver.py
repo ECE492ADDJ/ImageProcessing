@@ -24,8 +24,8 @@ from SerialException import SerialException
 
 # TODO: Allow these values to be changed at runtime.
 MAX_ACC = 100
-FRAMERATE = 2
-ACC_MULTIPLIER = 2
+FRAMERATE = 15
+ACC_MULTIPLIER = 0.5
 
 class MazeSolver(object):
     """
@@ -82,12 +82,14 @@ class MazeSolver(object):
         self._end_mask = None
         self._path = None
         self._finished = True
+        self._stopped = False
 
     def run(self):
         """
         Starts the maze solving process. This method blocks until the maze has been solved, but
         will call update_callback on a regular basis to allow the UI to be updated.
         """
+        self._stopped = False
         self._finished = False
 
         if self.fixed_image_path is None:
@@ -133,13 +135,20 @@ class MazeSolver(object):
             planner.speed = 50
 
             with ServoConnection(port=self.serial_port) as conn:
-                flat_x = conn.get_x_val()
-                flat_y = conn.get_y_val()
+                try:
+                    flat_x = conn.get_x_val()
+                    flat_y = conn.get_y_val()
+                except SerialException:
+                    flat_x = conn.get_x_val()
+                    flat_y = conn.get_y_val()
 
                 relative_max_x = min(abs(-1 * MAX_ACC - flat_x), MAX_ACC - flat_x)
                 relative_max_y = min(abs(-1 * MAX_ACC - flat_y), MAX_ACC - flat_y)
 
                 while not planner.isFinished():
+                    if self._stopped:
+                        break
+
                     start_time = time.clock()
                     retval, self._current_image = camera.read()
                     if not retval:
@@ -151,8 +160,8 @@ class MazeSolver(object):
                     try:
                         new_x_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_x * ACC_MULTIPLIER + flat_x))
                         new_y_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_y * ACC_MULTIPLIER + flat_y))
-                        conn.set_x_val(new_x_acc)
-                        conn.set_y_val(new_y_acc)
+                        conn.set_x_val(int(new_x_acc))
+                        conn.set_y_val(int(new_y_acc))
                     except SerialException as ex:
                         print ex
 
@@ -201,6 +210,12 @@ class MazeSolver(object):
         Returns a list of node objects that represent the ball path.
         """
         return self._path
+
+    def stop(self):
+        """
+        Stops the maze solver.
+        """
+        self._stopped = True
 
 def parseThreshold(threshold):
     """

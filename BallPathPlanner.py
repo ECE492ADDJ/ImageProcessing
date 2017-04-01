@@ -8,8 +8,9 @@ Description:    This file contains the relevant code for planning and following 
 maze.
 """
 import time
-import Node
 from math import sqrt
+import collections
+import Node
 
 class BallPathPlanner(object):
     """
@@ -29,20 +30,27 @@ class BallPathPlanner(object):
 
     latency: The expected latency between a command being sent and the change in acceleration being
     effected measured in seconds.
+
+    pos_queue_size: Determines the size of the queue that stores past positions. This queue is used
+    to mitigate the effect of bouncing off of walls on the percieved velocity
     """
     def __init__(self, nodes):
         self._nodes = nodes
-        self.lookahead = 5
-        self.weightingFactor = 0.7
+        self.lookahead = 2
+        self.weightingFactor = 0.95
         self.speed = 5
         self.proxThreshold = 10
         self.latency = 0.01
+        self.pos_queue_size = 5
 
         self._finished = False
         self._last_x = None
         self._last_y = None
+        self._last_acc_x = 0
+        self._last_acc_y = 0
         self._last_time = None
         self._current_node_index = 0
+        self._positions = collections.deque(maxlen=self.pos_queue_size)
 
     def getAcceleration(self, ball_x, ball_y):
         """
@@ -54,17 +62,18 @@ class BallPathPlanner(object):
 
         ball_y: Vertical position of the ball in pixels.
         """
-        if self._current_node_index == len(self._nodes):
-            # Final node, we made it!
-            self._finished = True
-            return (0, 0)
+
+        self._positions.append((ball_x, ball_y))
+        sums = reduce(lambda pos1, pos2: (pos1[0] + pos2[0], pos1[1] + pos2[1]), self._positions)
+        ball_x = sums[0] / len(self._positions)
+        ball_y = sums[1] / len(self._positions)
 
         curr = time.clock()
         if self._last_time is None:
             vel = (0, 0)
         else:
-            vel = ((ball_x - self._last_x) / (curr - self._last_time),
-                    (ball_y - self._last_y) / (curr - self._last_time))
+            vel = ((ball_x - self._last_x) / ((curr - self._last_time) * self.pos_queue_size),
+                    (ball_y - self._last_y) / ((curr - self._last_time) * self.pos_queue_size))
 
         expected_ball_x = ball_x + vel[0] * self.latency
         expected_ball_y = ball_y + vel[1] * self.latency
@@ -73,10 +82,10 @@ class BallPathPlanner(object):
                                         expected_ball_y, self._current_node_index)
 
         if self._last_time is None:
-            acc = (desired_vel[0], desired_vel[1])
+            new_acc = (desired_vel[0], desired_vel[1])
         else:
             dt = curr - self._last_time
-            acc = ((desired_vel[0] - vel[0]) / dt, (desired_vel[1] - vel[1]) / dt)
+            new_acc = ((desired_vel[0] - vel[0]) / dt, (desired_vel[1] - vel[1]) / dt)
 
         currentnode = self._nodes[self._current_node_index]
         dx = ball_x - currentnode.coordinates[0]
@@ -85,10 +94,23 @@ class BallPathPlanner(object):
         if sqrt(dx * dx + dy * dy) <= self.proxThreshold:
             self._current_node_index += 1
 
+        if self._current_node_index == len(self._nodes):
+            # Final node, we made it!
+            self._finished = True
+            return (0, 0)
+
         self._last_x = ball_x
         self._last_y = ball_y
         self._last_time = time.clock()
-        return acc
+
+        acc = (0.5 * new_acc[0] + 0.5 * desired_vel[0] / self.speed, 0.5 * new_acc[1] + 0.5 * desired_vel[1] / self.speed)
+        self._last_acc_x = new_acc[0]
+        self._last_acc_y = new_acc[1]
+
+
+        print "acc: ({0:5.0f}, {1:5.0f}) pos: ({2:3.0f}, {3:3.0f}) target:({4:3.0f}, {5:3.0f})".format(new_acc[0], new_acc[1], ball_x, ball_y, self._nodes[self._current_node_index].coordinates[0], self._nodes[self._current_node_index].coordinates[1])
+
+        return new_acc
 
     def isFinished(self):
         """

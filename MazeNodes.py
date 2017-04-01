@@ -70,7 +70,7 @@ class MazeNodes:
 
         self.min_path_thickness = 30
         self.scan_interval = 20
-        self.nodes_per_path = 3
+        self.nodes_per_path = 2
 
 
     def runProcessing(self):

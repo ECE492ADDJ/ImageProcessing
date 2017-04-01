@@ -70,7 +70,7 @@ class PathFinder:
 
         #sp = self.reduceNodes(path)
 
-        return path
+        return self.reduceNodes(path)
 
     #http://code.activestate.com/recipes/576675-bfs-breadth-first-search-graph-traversal/
     def breadthFirstSearch(self, g, start):

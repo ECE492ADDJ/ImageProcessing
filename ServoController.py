@@ -87,6 +87,9 @@ class ServoConnection:
         # Compensation for servo orientation
         val = -1 * val
 
+        if val < 0:
+            val = val + 2 ** 16
+
         self.serconn.write(self.__MSG_OPEN_CHAR + self.__CMD_SETX + '%04x' % val + self.__MSG_CLOSE_CHAR)
 
         resp = self.serconn.read_until(self.__MSG_CLOSE_CHAR)
@@ -100,6 +103,9 @@ class ServoConnection:
         if not self.serconn.is_open:
             self.serconn.open()
 
+        if val < 0:
+            val += 2 ** 16
+
         self.serconn.write(self.__MSG_OPEN_CHAR + self.__CMD_SETY + '%04x' % val + self.__MSG_CLOSE_CHAR)
 
         resp = self.serconn.read_until(self.__MSG_CLOSE_CHAR)
@@ -108,6 +114,14 @@ class ServoConnection:
             raise NoResponseException("No response received for SETY.")
         elif resp != self.__MSG_OPEN_CHAR + self.__ACK_STR + self.__MSG_CLOSE_CHAR:
             raise InvalidResponseException("SETY not acknowledged.")
+
+
+# Source: http://stackoverflow.com/a/9147327
+def twos_comp(val, bits):
+    """compute the 2's compliment of int value val"""
+    if (val & (1 << (bits - 1))) != 0: # if sign bit is set e.g., 8bit: 128-255
+        val = val - (1 << bits)        # compute negative value
+    return val                         # return positive value as is
 
 
 if __name__ == '__main__':
@@ -175,11 +189,3 @@ if __name__ == '__main__':
                     continue
             else:
                 print "Invalid command; try testconn, setx, sety, getx, or gety."
-
-
-# Source: http://stackoverflow.com/a/9147327
-def twos_comp(val, bits):
-    """compute the 2's compliment of int value val"""
-    if (val & (1 << (bits - 1))) != 0: # if sign bit is set e.g., 8bit: 128-255
-        val = val - (1 << bits)        # compute negative value
-    return val                         # return positive value as is
