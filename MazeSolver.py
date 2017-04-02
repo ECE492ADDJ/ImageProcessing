@@ -158,6 +158,7 @@ class MazeSolver(object):
                         new_x_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_x * ACC_MULTIPLIER + flat_x))
                         new_y_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_y * ACC_MULTIPLIER + flat_y))
                         conn.set_x_val(int(new_x_acc))
+                        time.sleep(0.001)
                         conn.set_y_val(int(new_y_acc))
                     except SerialException as ex:
                         print ex

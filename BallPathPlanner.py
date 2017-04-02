@@ -44,8 +44,8 @@ class BallPathPlanner(object):
         self.speed = 50
         self.proxThreshold = 20
         self.latency = 0.01
-        self.pos_queue_size = 10
-        self.failure_timeout = 6
+        self.pos_queue_size = 3
+        self.failure_timeout = 8
 
         self._finished = False
         self._last_x = None
