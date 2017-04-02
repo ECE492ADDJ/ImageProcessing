@@ -25,7 +25,7 @@ from SerialException import SerialException
 # TODO: Allow these values to be changed at runtime.
 MAX_ACC = 100
 FRAMERATE = 15
-ACC_MULTIPLIER = 0.5
+ACC_MULTIPLIER = 0.6125
 
 class MazeSolver(object):
     """
@@ -130,9 +130,6 @@ class MazeSolver(object):
             ball_finder = FindBall(mazenodes.start_lower, mazenodes.start_upper,
                     mazenodes.filt_close, mazenodes.filt_open)
             planner = BallPathPlanner(self._path)
-            # TODO: Allow planner speed, latency, acceleration factor, etc to be set a runtime.
-            # Possibly through a config file?
-            planner.speed = 50
 
             with ServoConnection(port=self.serial_port) as conn:
                 try:

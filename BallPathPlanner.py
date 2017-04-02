@@ -33,15 +33,19 @@ class BallPathPlanner(object):
 
     pos_queue_size: Determines the size of the queue that stores past positions. This queue is used
     to mitigate the effect of bouncing off of walls on the percieved velocity
+
+    failure_timeout: If the ball does not get to a new node in this amount of time, the target node
+    will be set to the previous node
     """
     def __init__(self, nodes):
         self._nodes = nodes
         self.lookahead = 2
         self.weightingFactor = 0.95
-        self.speed = 5
-        self.proxThreshold = 10
+        self.speed = 50
+        self.proxThreshold = 20
         self.latency = 0.01
-        self.pos_queue_size = 5
+        self.pos_queue_size = 10
+        self.failure_timeout = 6
 
         self._finished = False
         self._last_x = None
@@ -51,6 +55,7 @@ class BallPathPlanner(object):
         self._last_time = None
         self._current_node_index = 0
         self._positions = collections.deque(maxlen=self.pos_queue_size)
+        self._last_success_time = None
 
     def getAcceleration(self, ball_x, ball_y):
         """
@@ -62,6 +67,8 @@ class BallPathPlanner(object):
 
         ball_y: Vertical position of the ball in pixels.
         """
+        if self._last_success_time is None:
+            self._last_success_time = time.clock()
 
         self._positions.append((ball_x, ball_y))
         sums = reduce(lambda pos1, pos2: (pos1[0] + pos2[0], pos1[1] + pos2[1]), self._positions)
@@ -92,12 +99,17 @@ class BallPathPlanner(object):
         dy = ball_y - currentnode.coordinates[1]
 
         if sqrt(dx * dx + dy * dy) <= self.proxThreshold:
+            self._last_success_time = curr
             self._current_node_index += 1
 
         if self._current_node_index == len(self._nodes):
             # Final node, we made it!
             self._finished = True
             return (0, 0)
+
+        if curr - self._last_success_time > self.failure_timeout:
+            self._last_success_time = time.clock()
+            self._current_node_index -= 1
 
         self._last_x = ball_x
         self._last_y = ball_y
