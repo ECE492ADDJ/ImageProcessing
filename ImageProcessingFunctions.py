@@ -57,23 +57,24 @@ def drawResults(image, all_nodes, path_nodes, start, end):
     Input: original image, list of all Node objects found, ordered list of all Node
         objects in path found, start Node object, end Node object
     """
-    # Draw nodes
-    for n in all_nodes:
-        cv2.circle(image, n, 3, (150, 150, 150), -1)
-
-    # Draw start and end
-    cv2.circle(image, start.coordinates, 10, (0, 220, 220), -1)
-    cv2.circle(image, end.coordinates, 10, (200, 10, 200), -1)
 
     # Draw edges
     for n in all_nodes:
         for nb in all_nodes.get(n).neighbours:
-            cv2.line(image, n, nb.coordinates, (178, 178, 178), 2)
+            cv2.line(image, n, nb.coordinates, (128, 200, 128), 2)
+
+    # Draw nodes
+    for n in all_nodes:
+        cv2.circle(image, n, 2, (100, 100, 100), -1)
+
+    # Draw start and end
+    cv2.circle(image, start.coordinates, 10, (255, 150, 50), -1)
+    cv2.circle(image, end.coordinates, 10, (10, 10, 255), -1)
 
     # Draw path
     for n in range(0, len(path_nodes) - 1):
-        cv2.circle(image, path_nodes[n].coordinates, 10, (0, 0, 255), -1)
-        cv2.line(image, path_nodes[n].coordinates, path_nodes[n + 1].coordinates, (255, 200, 0), 2)
+        cv2.circle(image, path_nodes[n].coordinates, 5, (0, 255, 0), -1)
+        cv2.line(image, path_nodes[n].coordinates, path_nodes[n + 1].coordinates, (0, 255, 0), 2)
 
     # show the images
     cv2.imshow("images", np.hstack([image]))

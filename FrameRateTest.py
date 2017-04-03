@@ -19,10 +19,19 @@ mazenodes = MazeNodes(ball_im)
 
 fb = FindBall(mazenodes.start_lower, mazenodes.start_upper, mazenodes.filt_close, mazenodes.filt_open)
 
+rates = []
+x = 0
+
 # Continually take image, find ball, print ball location, return time taken over all operations
-while True:
+while x < 100:
     start_time = time.clock()
     retval, current_image = camera.read()
     ball_x, ball_y = fb.findBall(ball_im)
-    print ball_x, ball_y
-    print time.clock() - start_time
+    t = time.clock() - start_time
+    rates.append(t)
+    x += 1
+
+s = 0
+for r in rates:
+    s += r
+print s/len(rates)

@@ -68,7 +68,7 @@ class AutoTiltingBallMaze:
 		portNumbers = self.serial_ports()
 		portNumbers.append("I don't see my port . . .")
 
-		# Drop down serial port menu 
+		# Drop down serial port menu
 		self.portNum = StringVar(root)
 		self.portNum.set("Please select a port")
 		dropPort = apply(OptionMenu, (root, self.portNum) + tuple(portNumbers))
@@ -81,7 +81,7 @@ class AutoTiltingBallMaze:
 			camIndex.append(n)
 		camIndex.append("I don't see my camera . . .")
 
-		# Camera Menu		
+		# Camera Menu
 		self.cameraIndex = StringVar(root)
 		self.cameraIndex.set("Please select a camera")
 		dropCamera = apply(OptionMenu, (root, self.cameraIndex) + tuple(camIndex))
@@ -136,7 +136,7 @@ class AutoTiltingBallMaze:
 		imgtk = ImageTk.PhotoImage(image=img)
 		self.lmain.imgtk = imgtk
 		self.lmain.configure(image=imgtk)
-		self.lmain.after(10, self.show_frame) 
+		self.lmain.after(10, self.show_frame)
 
 
 	# Function that grabs all the values input by the user and applies them to our main mazesolver code
@@ -182,7 +182,7 @@ class AutoTiltingBallMaze:
 		self.checkCamera()
 
 
-	def serial_ports(self):  
+	def serial_ports(self):
 		ports = list(serial.tools.list_ports.comports())
 		return ports
 
