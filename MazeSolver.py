@@ -78,12 +78,16 @@ class MazeSolver(object):
         self.update_callback = lambda ms: None
 
         self._current_image = None
-        self._play_mask = None
-        self._start_mask = None
-        self._end_mask = None
+        # self._play_mask = None
+        # self._start_mask = None
+        # self._end_mask = None
         self._path = None
         self._finished = True
         self._stopped = False
+        self._ball_x = 0
+        self._ball_y = 0
+        self._end_x = 0
+        self._end_y = 0
 
     def run(self):
         """
@@ -121,6 +125,8 @@ class MazeSolver(object):
         pathfinder = PathFinder(nodes, start_node, end_node)
         self._path = pathfinder.findPath()
 
+        self._end_x, self._end_y = end_node.coordinates
+
         if self.debug:
             img.drawResults(self._current_image, nodes, self._path, start_node, end_node)
 
@@ -153,8 +159,8 @@ class MazeSolver(object):
                     if not retval:
                         raise IOError("Failed to read image from camera.")
 
-                    ball_x, ball_y = ball_finder.findBall(self._current_image)
-                    acc_x, acc_y = planner.getAcceleration(ball_x, ball_y)
+                    self._ball_x, self._ball_y = ball_finder.findBall(self._current_image)
+                    acc_x, acc_y = planner.getAcceleration(self._ball_x, self._ball_y)
 
                     try:
                         new_x_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_x * ACC_MULTIPLIER + flat_x))
@@ -181,23 +187,35 @@ class MazeSolver(object):
         """
         return self._finished
 
-    def get_play_mask(self):
-        """
-        Returns an opencv mask showing the play space.
-        """
-        return self._play_mask
+    # def get_play_mask(self):
+    #     """
+    #     Returns an opencv mask showing the play space.
+    #     """
+    #     return self._play_mask
 
-    def get_start_mask(self):
-        """
-        Returns an opencv mask showing the start (ball).
-        """
-        return self._start_mask
+    # def get_start_mask(self):
+    #     """
+    #     Returns an opencv mask showing the start (ball).
+    #     """
+    #     return self._start_mask
 
-    def get_end_mask(self):
+    # def get_end_mask(self):
+    #     """
+    #     Returns an opencv mask showing the end of the maze.
+    #     """
+    #     return self._end_mask
+
+    def get_ball_pos(self):
         """
-        Returns an opencv mask showing the end of the maze.
+        Returns a tuple containing the (X, Y) values of the current ball position.
         """
-        return self._end_mask
+        return (self._ball_x, self._ball_y)
+
+    def get_end_pos(self):
+        """
+        Returns a tuple containing the (X, Y) values of the end node.
+        """
+        return (self._end_x, self._end_y)
 
     def get_image(self):
         """
