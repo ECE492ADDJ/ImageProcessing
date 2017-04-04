@@ -73,6 +73,7 @@ class MazeSolver(object):
         self.serial_port = '/dev/ttyUSB0'
         self.camera_index = 0
         self.fixed_image_path = None
+        self.debug = False
 
         self.update_callback = lambda ms: None
 
@@ -104,7 +105,7 @@ class MazeSolver(object):
         # Run initial image processing
         mazenodes = MazeNodes(self._current_image, self.end_colour_lower, self.end_colour_upper,
                                 self.start_colour_lower, self.start_colour_upper,
-                                  self.play_colour_lower, self.play_colour_upper)
+                                  self.play_colour_lower, self.play_colour_upper, self.debug)
         mazenodes.runProcessing()
 
         nodes = mazenodes.nodes
@@ -120,7 +121,8 @@ class MazeSolver(object):
         pathfinder = PathFinder(nodes, start_node, end_node)
         self._path = pathfinder.findPath()
 
-        img.drawResults(self._current_image, nodes, self._path, start_node, end_node)
+        if self.debug:
+            img.drawResults(self._current_image, nodes, self._path, start_node, end_node)
 
         if not self.fixed_image_path is None:
             # Debug: draw result of pathfinding
@@ -227,7 +229,7 @@ if __name__ == '__main__':
     try:
         options, remains = getopt.getopt(sys.argv[1:], "",
                 ["help=", "image=", "camera=", "serial=", "play_upper=", "play_lower=",
-                "start_upper=", "start_lower=", "end_upper=", "end_lower="])
+                "start_upper=", "start_lower=", "end_upper=", "end_lower=", "debug"])
     except getopt.GetoptError:
         print "usage: MazeSolver.py [--help] [--image <image file>] [--camera <index>] \
 [--serial <port name>] [--play_upper B,G,R] [--play_lower B,G,R] [--start_upper B,G,R] \
@@ -260,5 +262,7 @@ if __name__ == '__main__':
             solver.end_colour_upper = parseThreshold(value)
         elif option == "--end_lower":
             solver.end_colour_lower = parseThreshold(value)
+        elif option == "--debug":
+            solver.debug = True
 
     solver.run()
