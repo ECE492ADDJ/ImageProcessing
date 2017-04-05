@@ -44,12 +44,13 @@ class BallPathPlanner(object):
         self.speed = 50
         self.proxThreshold = 20
         self.latency = 0.01
-        self.pos_queue_size = 3
+        self.pos_queue_size = 5
         self.failure_timeout = 8
 
         self._finished = False
         self._last_x = None
         self._last_y = None
+        self._target_coords = (0, 0)
         self._last_acc_x = 0
         self._last_acc_y = 0
         self._last_time = None
@@ -114,6 +115,7 @@ class BallPathPlanner(object):
         self._last_x = ball_x
         self._last_y = ball_y
         self._last_time = time.clock()
+        self._target_coords = self._nodes[self._current_node_index].coordinates
 
         acc = (0.5 * new_acc[0] + 0.5 * desired_vel[0] / self.speed, 0.5 * new_acc[1] + 0.5 * desired_vel[1] / self.speed)
         self._last_acc_x = new_acc[0]
@@ -123,6 +125,12 @@ class BallPathPlanner(object):
         print "acc: ({0:5.0f}, {1:5.0f}) pos: ({2:3.0f}, {3:3.0f}) target:({4:3.0f}, {5:3.0f})".format(new_acc[0], new_acc[1], ball_x, ball_y, self._nodes[self._current_node_index].coordinates[0], self._nodes[self._current_node_index].coordinates[1])
 
         return new_acc
+
+    def get_target_pos(self):
+        """
+        Returns a tuple containing the (X, Y) values of the current target position.
+        """
+        return self._target_coords
 
     def isFinished(self):
         """

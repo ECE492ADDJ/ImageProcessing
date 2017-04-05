@@ -181,7 +181,13 @@ class AutoTiltingBallMaze:
 
 		def update(slvr):
 			img = slvr.get_image()
-			cv2.circle(img, slvr.get_ball_pos(), 5, (230, 100, 40), -1)
+			cv2.circle(img, slvr.get_ball_pos(), 8, (230, 100, 40), -1)
+			cv2.circle(img, slvr.get_end_pos(), 8, (50, 120, 240), -1)
+			cv2.circle(img, slvr.get_target_pos(), 8, (80, 50, 250), -1)
+			cv2.putText(img,
+					"Serial Success Rate: {0:.0f}%".format(slvr.get_serial_success_rate() * 100),
+					(10, 20), cv2.FONT_HERSHEY_PLAIN,
+					1, (255, 255, 255), 1, cv2.LINE_AA)
 			cv2.imshow("Live Maze Feed", img)
 			cv2.waitKey(1)
 

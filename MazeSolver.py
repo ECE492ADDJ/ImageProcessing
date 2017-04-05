@@ -12,8 +12,9 @@ Description:    Main control script for python server
 # import the necessary packages
 import sys
 import time
-import cv2
 import getopt
+from collections import deque
+import cv2
 import ImageProcessingFunctions as img
 from MazeNodes import MazeNodes
 from PathFinder import PathFinder
@@ -26,6 +27,7 @@ from SerialException import SerialException
 MAX_ACC = 100
 FRAMERATE = 15
 ACC_MULTIPLIER = 0.6125
+SER_COUNT = 20
 
 class MazeSolver(object):
     """
@@ -78,9 +80,6 @@ class MazeSolver(object):
         self.update_callback = lambda ms: None
 
         self._current_image = None
-        # self._play_mask = None
-        # self._start_mask = None
-        # self._end_mask = None
         self._path = None
         self._finished = True
         self._stopped = False
@@ -88,6 +87,10 @@ class MazeSolver(object):
         self._ball_y = 0
         self._end_x = 0
         self._end_y = 0
+        self._target_coords = (0, 0)
+        self._acc_x = 0
+        self._acc_y = 0
+        self._ser_results = deque(maxlen=SER_COUNT)
 
     def run(self):
         """
@@ -147,9 +150,6 @@ class MazeSolver(object):
                     flat_x = conn.get_x_val()
                     flat_y = conn.get_y_val()
 
-                relative_max_x = min(abs(-1 * MAX_ACC - flat_x), MAX_ACC - flat_x)
-                relative_max_y = min(abs(-1 * MAX_ACC - flat_y), MAX_ACC - flat_y)
-
                 while not planner.isFinished():
                     if self._stopped:
                         break
@@ -160,16 +160,20 @@ class MazeSolver(object):
                         raise IOError("Failed to read image from camera.")
 
                     self._ball_x, self._ball_y = ball_finder.findBall(self._current_image)
-                    acc_x, acc_y = planner.getAcceleration(self._ball_x, self._ball_y)
+                    self._acc_x, self._acc_y = planner.getAcceleration(self._ball_x, self._ball_y)
+                    self._target_coords = planner.get_target_pos()
 
                     try:
-                        new_x_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_x * ACC_MULTIPLIER + flat_x))
-                        new_y_acc = max(-1 * MAX_ACC, min(MAX_ACC, acc_y * ACC_MULTIPLIER + flat_y))
+                        new_x_acc = max(-1 * MAX_ACC, min(MAX_ACC, self._acc_x * ACC_MULTIPLIER + flat_x))
+                        new_y_acc = max(-1 * MAX_ACC, min(MAX_ACC, self._acc_y * ACC_MULTIPLIER + flat_y))
                         conn.set_x_val(int(new_x_acc))
+                        self._ser_results.append(1)
                         time.sleep(0.001)
                         conn.set_y_val(int(new_y_acc))
+                        self._ser_results.append(1)
                     except SerialException as ex:
                         print ex
+                        self._ser_results.append(0)
 
                     self.update_callback(self)
 
@@ -187,24 +191,6 @@ class MazeSolver(object):
         """
         return self._finished
 
-    # def get_play_mask(self):
-    #     """
-    #     Returns an opencv mask showing the play space.
-    #     """
-    #     return self._play_mask
-
-    # def get_start_mask(self):
-    #     """
-    #     Returns an opencv mask showing the start (ball).
-    #     """
-    #     return self._start_mask
-
-    # def get_end_mask(self):
-    #     """
-    #     Returns an opencv mask showing the end of the maze.
-    #     """
-    #     return self._end_mask
-
     def get_ball_pos(self):
         """
         Returns a tuple containing the (X, Y) values of the current ball position.
@@ -217,11 +203,30 @@ class MazeSolver(object):
         """
         return (self._end_x, self._end_y)
 
+    def get_target_pos(self):
+        """
+        Returns a tuple containing the (X, Y) values of the current target position.
+        """
+        return self._target_coords
+
+    def get_acceleration(self):
+        """
+        Returns a tuple representing the current acceleration.
+        """
+        return (self._acc_x, self._acc_y)
+
     def get_image(self):
         """
         Returns the most recent image.
         """
         return self._current_image
+
+    def get_serial_success_rate(self):
+        """
+        Gets the fraction of recent serial operations that have succeeded expressed as a number
+        between 0 and 1.
+        """
+        return float(reduce(lambda x, y: x + y, self._ser_results)) / len(self._ser_results)
 
     def get_path(self):
         """
