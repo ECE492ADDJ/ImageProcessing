@@ -46,10 +46,11 @@ class FindBall:
         """
         Determine current location of ball (center pixel location) in an image of the maze
         """
+        # Crop outside of maze
         crop = np.zeros(image.shape, dtype=np.uint8)
-        cv2.rectangle(crop, (75, 35), (530, 420), [255, 255, 255], -1)
-        image[np.where(crop!=[255])] = [0]
-        
+        cv2.rectangle(crop, (75, 35), (525, 415), [255, 255, 255], -1)
+        image[np.where(crop!=[255])] = [0] # black out crop
+
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
         ball_mask = cv2.inRange(image, self.thresh_lower, self.thresh_upper) # find ball
         ball_x, ball_y = findRegionCenter(ball_mask, self.filt_close, self.filt_open)
