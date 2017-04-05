@@ -48,7 +48,7 @@ class FindBall:
         """
         # Crop outside of maze
         crop = np.zeros(image.shape, dtype=np.uint8)
-        cv2.rectangle(crop, (75, 35), (530, 420), [255, 255, 255], -1)
+        cv2.rectangle(crop, (75, 35), (525, 415), [255, 255, 255], -1)
         image[np.where(crop!=[255])] = [0] # black out crop
 
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
