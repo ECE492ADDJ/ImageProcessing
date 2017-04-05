@@ -65,15 +65,10 @@ class AutoTiltingBallMaze:
 		self.endEntry2.insert(END, "150,70,190")
 		self.endEntry2.grid(row=4,column=2)
 
-		# Get all available serial ports
-		portNumbers = self.serial_ports()
-		portNumbers.append("I don't see my port . . .")
-
-		# Drop down serial port menu
-		self.portNum = StringVar(root)
-		self.portNum.set("Please select a port")
-		dropPort = apply(OptionMenu, (root, self.portNum) + tuple(portNumbers))
-		dropPort.grid(row=5, column=1, columnspan=2)
+		# Serial Port text field
+		self.portNum = Entry(root)
+		self.portNum.insert(END, "/dev/ttyUSB0")
+		self.portNum.grid(row=5, column=1)
 
 		# Get all available camera's
 		camIndices = self.detectNumCameras()
@@ -137,7 +132,7 @@ class AutoTiltingBallMaze:
 		imgtk = ImageTk.PhotoImage(image=img)
 		self.lmain.imgtk = imgtk
 		self.lmain.configure(image=imgtk)
-		self.lmain.after(10, self.show_frame)
+		# self.lmain.after(10, self.show_frame)
 
 
 	# Grabs the variables to be input into our MazeSolver class
@@ -172,14 +167,26 @@ class AutoTiltingBallMaze:
 		solver.start_colour_lower = startLower
 		solver.end_colour_upper = endUpper
 		solver.end_colour_lower = endLower
-		# solver.serial_port = serialPort
+		solver.serial_port = serialPort
 		solver.camera_index = int(camIndex)
 
 		# Release the camera
-		self.cap.release()
+		try:
+			self.cap.release()
+		except:
+			pass
 
+		def update(slvr):
+			img = slvr.get_image()
+			cv2.circle(img, slvr.get_ball_pos(), 5, (230, 100, 40), -1)
+			cv2.imshow("Live Maze Feed", img)
+			cv2.waitKey(1)
+
+		solver.update_callback = update
 		# Run the MazeSolver
 		solver.run()
+
+		cv2.destroyWindow("Live Maze Feed")
 
 	# Simple function that returns a list of the available serial ports
 	def serial_ports(self):
