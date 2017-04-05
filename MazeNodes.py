@@ -95,22 +95,27 @@ class MazeNodes:
         play_lower_np = np.array(self.play_lower, dtype="uint8")
         play_upper_np = np.array(self.play_upper, dtype="uint8")
 
+        # # Crop outside of maze
+        # crop = np.zeros(self.image.shape, dtype=np.uint8)
+        # cv2.rectangle(crop, (75, 35), (530, 420), [255, 255, 255], -1)
+        # self.image[np.where(crop != [255])] = [0] # black out crop
+
         # Find endone and white it out
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
         end_mask = cv2.inRange(self.image, end_lower_np, end_upper_np) # find endzone area
         self.findEnd(end_mask)
         self.image[np.where(end_mask == [255])] = 255 # white out endzone
 
-        cv2.imshow("End Mask", end_mask)
-        cv2.waitKey(0)
+        # cv2.imshow("End Mask", end_mask)
+        # cv2.waitKey(0)
 
         # Find start (ball) and white it out
         start_mask = cv2.inRange(self.image, start_lower_np, start_upper_np) # find ball (start)
         self.findStart(start_mask)
         self.image[np.where(start_mask == [255])] = 255 # white out ball
 
-        cv2.imshow("Start Mask", start_mask)
-        cv2.waitKey(0)
+        # cv2.imshow("Start Mask", start_mask)
+        # cv2.waitKey(0)
 
         mask = cv2.inRange(self.image, play_lower_np, play_upper_np) # find white (playing) area
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.filt_close)
@@ -118,8 +123,8 @@ class MazeNodes:
         self.image[np.where(mask == [255])] = 255 # white out white
         self.image[np.where(mask != [255])] = 0 # white out white
 
-        cv2.imshow("Play Mask", mask)
-        cv2.waitKey(0)
+        # cv2.imshow("Play Mask", mask)
+        # cv2.waitKey(0)
 
         # Determine the grid size based on path thickness
         path_width, path_height = self._getPathThickness(mask)
