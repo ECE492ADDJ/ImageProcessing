@@ -109,7 +109,7 @@ class BallPathPlanner(object):
 
         if curr - self._last_success_time > self.failure_timeout:
             self._last_success_time = time.clock()
-            self._current_node_index -= 1
+            self._current_node_index = max(0, self._current_node_index - 1)
 
         self._last_x = ball_x
         self._last_y = ball_y

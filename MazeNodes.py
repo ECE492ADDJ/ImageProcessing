@@ -44,7 +44,8 @@ class MazeNodes:
 
     def __init__(self, image, end_thresh_low = [160, 80, 230], end_thresh_high = [180, 100, 255],
                                 start_thresh_low = [0, 90, 100], start_thresh_high = [50, 220, 220],
-                                  play_thresh_low = [40, 40, 40], play_thresh_high = [255, 255, 255]):
+                                  play_thresh_low = [40, 40, 40], play_thresh_high = [255, 255, 255],
+                                  debug = False):
         self.image = image
 
         self.nodes = {}
@@ -71,6 +72,8 @@ class MazeNodes:
         self.min_path_thickness = 30
         self.scan_interval = 20
         self.nodes_per_path = 3
+
+        self.debug = debug
 
 
     def runProcessing(self):
@@ -106,16 +109,18 @@ class MazeNodes:
         self.findEnd(end_mask)
         self.image[np.where(end_mask == [255])] = 255 # white out endzone
 
-        # cv2.imshow("End Mask", end_mask)
-        # cv2.waitKey(0)
+        if self.debug:
+            cv2.imshow("End Mask", end_mask)
+            cv2.waitKey(0)
 
         # Find start (ball) and white it out
         start_mask = cv2.inRange(self.image, start_lower_np, start_upper_np) # find ball (start)
         self.findStart(start_mask)
         self.image[np.where(start_mask == [255])] = 255 # white out ball
 
-        # cv2.imshow("Start Mask", start_mask)
-        # cv2.waitKey(0)
+        if self.debug:
+            cv2.imshow("Start Mask", start_mask)
+            cv2.waitKey(0)
 
         mask = cv2.inRange(self.image, play_lower_np, play_upper_np) # find white (playing) area
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.filt_close)
@@ -123,8 +128,9 @@ class MazeNodes:
         self.image[np.where(mask == [255])] = 255 # white out white
         self.image[np.where(mask != [255])] = 0 # white out white
 
-        # cv2.imshow("Play Mask", mask)
-        # cv2.waitKey(0)
+        if self.debug:
+            cv2.imshow("Play Mask", mask)
+            cv2.waitKey(0)
 
         # Determine the grid size based on path thickness
         path_width, path_height = self._getPathThickness(mask)
