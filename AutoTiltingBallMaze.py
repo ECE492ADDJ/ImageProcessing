@@ -176,10 +176,20 @@ class AutoTiltingBallMaze:
 		solver.camera_index = int(camIndex)
 
 		# Release the camera
-		self.cap.release()
+		if not self.cap is None:
+			self.cap.release()
 
+		def update(slvr):
+			img = slvr.get_image()
+			cv2.circle(img, slvr.get_ball_pos(), 5, (230, 100, 40), -1)
+			cv2.imshow("Live Maze Feed", img)
+			cv2.waitKey(1)
+
+		solver.update_callback = update
 		# Run the MazeSolver
 		solver.run()
+
+		cv2.destroyWindow("Live Maze Feed")
 
 	# Simple function that returns a list of the available serial ports
 	def serial_ports(self):  
