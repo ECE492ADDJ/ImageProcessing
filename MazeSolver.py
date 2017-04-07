@@ -26,7 +26,7 @@ from SerialException import SerialException
 # TODO: Allow these values to be changed at runtime.
 MAX_ACC = 100
 FRAMERATE = 15
-ACC_MULTIPLIER = 0.6125
+ACC_MULTIPLIER = 1
 SER_COUNT = 20
 
 class MazeSolver(object):

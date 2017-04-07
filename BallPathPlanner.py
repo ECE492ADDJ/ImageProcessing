@@ -40,16 +40,18 @@ class BallPathPlanner(object):
     def __init__(self, nodes):
         self._nodes = nodes
         self.lookahead = 2
-        self.weightingFactor = 0.95
-        self.speed = 50
-        self.proxThreshold = 20
-        self.latency = 0.01
+        self.weightingFactor = 0.9
+        self.speed = 80
+        self.proxThreshold = 25
+        self.latency = 0.02
         self.pos_queue_size = 5
         self.failure_timeout = 8
 
         self._finished = False
         self._last_x = None
         self._last_y = None
+        self._last_delta_vel_x = 0
+        self._last_delta_vel_y = 0
         self._target_coords = (0, 0)
         self._last_acc_x = 0
         self._last_acc_y = 0
@@ -93,7 +95,20 @@ class BallPathPlanner(object):
             new_acc = (desired_vel[0], desired_vel[1])
         else:
             dt = curr - self._last_time
-            new_acc = ((desired_vel[0] - vel[0]) / dt, (desired_vel[1] - vel[1]) / dt)
+            # try:
+            acc_fac_x = self._last_acc_x / self._last_delta_vel_x
+            acc_fac_y = self._last_acc_y / self._last_delta_vel_y
+                # acc_fac_x = self._last_delta_vel_x / vel[0]
+                # acc_fac_y = self._last_delta_vel_y / vel[1]
+            # except ZeroDivisionError:
+            #     acc_fac_x = abs(self._last_delta_vel_x / 0.98)
+            #     acc_fac_y = abs(self._last_delta_vel_y / 0.98)
+            # new_acc = ((desired_vel[0] - vel[0]) / dt, (desired_vel[1] - vel[1]) / dt)
+            # new_acc = ((desired_vel[0] - vel[0]) / dt * acc_fac_x, (desired_vel[1] - vel[1]) / dt * acc_fac_y)
+            new_acc = ((desired_vel[0] - vel[0]) * acc_fac_x, (desired_vel[1] - vel[1]) * acc_fac_y)
+
+        self._last_delta_vel_x = desired_vel[0] - vel[0]
+        self._last_delta_vel_y = desired_vel[1] - vel[1]
 
         currentnode = self._nodes[self._current_node_index]
         dx = ball_x - currentnode.coordinates[0]
@@ -117,7 +132,6 @@ class BallPathPlanner(object):
         self._last_time = time.clock()
         self._target_coords = self._nodes[self._current_node_index].coordinates
 
-        acc = (0.5 * new_acc[0] + 0.5 * desired_vel[0] / self.speed, 0.5 * new_acc[1] + 0.5 * desired_vel[1] / self.speed)
         self._last_acc_x = new_acc[0]
         self._last_acc_y = new_acc[1]
 
