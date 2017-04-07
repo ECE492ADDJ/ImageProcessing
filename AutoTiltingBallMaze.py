@@ -190,7 +190,10 @@ class AutoTiltingBallMaze:
 
 		solver.update_callback = update
 		# Run the MazeSolver
-		solver.run()
+		try:
+			solver.run()
+		except Exception as e:
+			tkMessageBox.showinfo("Error", e.message)
 
 		cv2.destroyWindow("Live Maze Feed")
 
