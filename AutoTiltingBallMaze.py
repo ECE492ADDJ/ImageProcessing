@@ -3,7 +3,7 @@ Filename:       AutoTiltingBallMaze.py
 File type:      server-side python code
 Author:         Jake Charlebois
 Created on:     2017-03-19
-Modified on:    2017-03-19
+Modified on:    2017-04-05
 Description:    Gui for entire project
 """
 
@@ -24,6 +24,9 @@ import time
 
 class AutoTiltingBallMaze:
 
+	"""
+	Initialize UI elements
+	"""
 	def __init__(self):
 
 		# Main Tkinter window that we add our elements too
@@ -82,10 +85,12 @@ class AutoTiltingBallMaze:
 		self.cameraIndex.set("Please select a camera")
 		dropCamera = apply(OptionMenu, (root, self.cameraIndex) + tuple(camIndex))
 		dropCamera.grid(row=6, column=1)
-		Button(root, text="Check", font=("Helvetica", 16), command=self.checkCamera).grid(row=6, column=2)#lambda: checkCamera(master))
+		Button(root, text="Check", font=("Helvetica", 16),
+				command=self.checkCamera).grid(row=6, column=2)#lambda: checkCamera(master))
 
 		# Solve Button
-		Button(root, text="                    Solve!                    ", command=self.grabVariables, font=("Helvetica", 16)).grid(row=8, column=0, columnspan=3, rowspan=2)
+		Button(root, text="                    Solve!                    ", command=self.grabVariables,
+				font=("Helvetica", 16)).grid(row=8, column=0, columnspan=3, rowspan=2)
 
 		#Camera Panel
 		imageFrame = Frame(root, width=600, height=500)
@@ -123,10 +128,13 @@ class AutoTiltingBallMaze:
 		root.mainloop()
 
 
+	"""
+	Take a video frame with the current camera and display it in the UI
+	"""
 	#show_frame insprired by http://stackoverflow.com/questions/16366857/show-webcam-sequence-tkinter
 	def show_frame(self):
 		_, frame = self.cap.read()
-		frame = cv2.flip(frame, 1)
+		frame = cv2.flip(frame, 1) # Flip frame so orientation in UI "matches" physical maze
 		cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
 		img = Image.fromarray(cv2image)
 		imgtk = ImageTk.PhotoImage(image=img)
@@ -135,7 +143,9 @@ class AutoTiltingBallMaze:
 		# self.lmain.after(10, self.show_frame)
 
 
-	# Grabs the variables to be input into our MazeSolver class
+	"""
+	Grabs the variables from their UI fields to be input into our MazeSolver class
+	"""
 	def grabVariables(self):
 
 		# Grab all the variables
@@ -176,6 +186,7 @@ class AutoTiltingBallMaze:
 		except:
 			pass
 
+		# Update UI with calculated values
 		def update(slvr):
 			img = slvr.get_image()
 			cv2.circle(img, slvr.get_ball_pos(), 8, (230, 100, 40), -1)
@@ -185,6 +196,7 @@ class AutoTiltingBallMaze:
 					"Serial Success Rate: {0:.0f}%".format(slvr.get_serial_success_rate() * 100),
 					(10, 20), cv2.FONT_HERSHEY_PLAIN,
 					1, (255, 255, 255), 1, cv2.LINE_AA)
+			# Create a frame to watch camera feed live
 			cv2.imshow("Live Maze Feed", img)
 			cv2.waitKey(1)
 
@@ -194,12 +206,16 @@ class AutoTiltingBallMaze:
 
 		cv2.destroyWindow("Live Maze Feed")
 
-	# Simple function that returns a list of the available serial ports
+	"""
+	Simple function that returns a list of the available serial ports
+	"""
 	def serial_ports(self):
 		ports = list(serial.tools.list_ports.comports())
 		return ports
 
-	# Simple function that returns the number of cameras connected to the 'server'
+	"""
+	Simple function that returns the number of cameras connected to the 'server'
+	"""
 	def detectNumCameras(self):
 		ind = 0
 		# Iterates through indexes until we cant find a camera
@@ -209,20 +225,22 @@ class AutoTiltingBallMaze:
 		    	ind += 1
 		        vc.release()
 		    else:
-		    	break
+		    	break # If valid camera cannot be opened, stop counting up
 		return ind
 
-	# Turns on the camera and continues to run show_frame() to provide a video feed
-	# for our Gui. If the camera is already in use it is first released so that our set camera
-	# index can be read from instead
+	"""
+	Turns on the camera and continues to run show_frame() to provide a video feed
+	for our Gui. If the camera is already in use it is first released so that our set camera
+	index can be read from instead
+	"""
 	def checkCamera(self):
 
 		try:
-			self.cap.release()
+			self.cap.release() # If there is already a camera, release it
 		except:
 			pass
 
-		self.cap = cv2.VideoCapture(int(self.cameraIndex.get()))
+		self.cap = cv2.VideoCapture(int(self.cameraIndex.get())) # Connect to camera with selected index from UI
 
 		_, frame = self.cap.read()
 		frame = cv2.flip(frame, 1)
@@ -234,7 +252,12 @@ class AutoTiltingBallMaze:
 		self.lmain.after(10, self.show_frame)
 
 
-	# Parses the CSV values from the user
+	"""
+	Parses the CSV values from the user
+
+	This class uses to parse the comma-separated colour thresholds supplied by
+	the user in the UI fields
+	"""
 	def parseThreshold(self, values):
 		strings = values.split(",")
 		return [int(string) for string in strings]
