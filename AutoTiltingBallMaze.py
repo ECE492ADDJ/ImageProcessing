@@ -220,12 +220,12 @@ class AutoTiltingBallMaze:
 		ind = 0
 		# Iterates through indexes until we cant find a camera
 		while True:
-		    vc = cv2.VideoCapture(ind)
-		    if (vc.isOpened()):
-		    	ind += 1
-		        vc.release()
-		    else:
-		    	break # If valid camera cannot be opened, stop counting up
+			vc = cv2.VideoCapture(ind)
+			if (vc.isOpened()):
+				ind += 1
+				vc.release()
+			else:
+				break # If valid camera cannot be opened, stop counting up
 		return ind
 
 	"""
