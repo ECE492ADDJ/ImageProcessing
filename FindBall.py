@@ -26,7 +26,6 @@ Description:    Use video frames to continuously detect the location of the ball
 import numpy as np
 import cv2, time
 from ImageProcessingFunctions import *
-#from MazeNodes import NUM_DIVS_X, NUM_DIVS_Y, START_THRESHOLD
 
 class FindBall:
 
@@ -52,6 +51,8 @@ class FindBall:
         image[np.where(crop!=[255])] = [0] # black out crop
 
         # http://answers.opencv.org/question/97416/replace-a-range-of-colors-with-a-specific-color-in-python/, 2017-02-08
+        # Black out edges of frame around maze area so only part of the image
+        #   containing the maze is analyzed
         ball_mask = cv2.inRange(image, self.thresh_lower, self.thresh_upper) # find ball
         ball_x, ball_y = findRegionCenter(ball_mask, self.filt_close, self.filt_open)
 
@@ -62,6 +63,10 @@ class FindBall:
     def calcAcceleration(self):
         """
         Based on previous 3 ball positions, determine current acceleration of the ball
+
+        If there is sufficient history to calcalate acceleration return the acceleration
+            in the x direction and in the y direction
+        If there is not sufficient history (< 3 entries) return None
         """
         len_hist = len(self.ball_history)
         if len_hist >= 3:

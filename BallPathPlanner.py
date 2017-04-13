@@ -98,13 +98,7 @@ class BallPathPlanner(object):
             # try:
             acc_fac_x = self._last_acc_x / self._last_delta_vel_x
             acc_fac_y = self._last_acc_y / self._last_delta_vel_y
-                # acc_fac_x = self._last_delta_vel_x / vel[0]
-                # acc_fac_y = self._last_delta_vel_y / vel[1]
-            # except ZeroDivisionError:
-            #     acc_fac_x = abs(self._last_delta_vel_x / 0.98)
-            #     acc_fac_y = abs(self._last_delta_vel_y / 0.98)
-            # new_acc = ((desired_vel[0] - vel[0]) / dt, (desired_vel[1] - vel[1]) / dt)
-            # new_acc = ((desired_vel[0] - vel[0]) / dt * acc_fac_x, (desired_vel[1] - vel[1]) / dt * acc_fac_y)
+
             new_acc = ((desired_vel[0] - vel[0]) * acc_fac_x, (desired_vel[1] - vel[1]) * acc_fac_y)
 
         self._last_delta_vel_x = desired_vel[0] - vel[0]

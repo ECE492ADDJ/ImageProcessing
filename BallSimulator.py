@@ -57,7 +57,6 @@ class BallSimulator(object):
         acc_y: Vertical acceleration measured in pixels per second squared.
         """
         if self.simulate_latency:
-            #threading.Timer(self.latency, self._setAccelerationNow, [acc_x, acc_y])
             latency_start = time.clock()
             while time.clock() - latency_start < self.latency:
                 pass
@@ -121,7 +120,6 @@ if __name__ == '__main__':
         start = time.clock()
 
         x, y = ballsim.getBallPos()
-        #print "X: {0:6}, Y: {1:6}".format(x, y)
         cv2.circle(image, (int(x), int(y)), 8, BALL_COLOUR)
         acc = planner.getAcceleration(x, y)
         ballsim.setAcceleration(acc[0], acc[1])
