@@ -8,12 +8,10 @@ Description:    Gui for entire project
 """
 
 from Tkinter import *
-from StopWatch import StopWatch
 from PIL import Image, ImageTk
 from StopWatch import StopWatch
 from serial.tools import list_ports
 from MazeSolver import MazeSolver
-# from MazeSolver import parseThreshold
 import serial
 import tkMessageBox
 import cv2

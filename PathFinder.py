@@ -60,7 +60,7 @@ class PathFinder:
         self.endNode = end
 
     def findPath(self):
-
+        """ Find a path from the start of the graph to the end """
         graph = {}
 
         for n in self.nodes:
@@ -68,12 +68,11 @@ class PathFinder:
 
         path = self.shortestPath(graph, self.startNode, self.endNode)
 
-        #sp = self.reduceNodes(path)
-
         return self.reduceNodes(path)
 
     #http://code.activestate.com/recipes/576675-bfs-breadth-first-search-graph-traversal/
     def breadthFirstSearch(self, g, start):
+        """ Implementation of the breadth first search pathfinding algorithm """
         queue, enqueued = deque([(None, start)]), set([start])
         while queue:
             parent, n = queue.popleft()
@@ -83,10 +82,12 @@ class PathFinder:
             queue.extend([(n, child) for child in new])
 
     def shortestPath(self, g, start, end):
+        """ Run breadthFirstSearch and return the path as a list of nodes in the correct order """
         parents = {}
         for parent, child in self.breadthFirstSearch(g, start):
             parents[child] = parent
             if child == end:
+                # Once path is found, reverse the order of the nodes in the path list
                 revpath = [end]
                 while True:
                     parent = parents[child]
@@ -120,12 +121,14 @@ class PathFinder:
 
         return directions
 
-    """ Remove redundant nodes (itermediate nodes in a straight line) from path """
     def reduceNodes(self, path):
+        """ Remove redundant nodes (itermediate nodes in a straight line) from path """
         reduced_path = []
         p = 0
         reduced_path.append(path[p])
 
+        # For Nodes in a straight line (either same x coordinates or same y coordinates)
+        #   only keep first and last Node in the line in the list of path Nodes
         while p < (len(path) - 1):
             if path[p].coordinates[0] == path[p + 1].coordinates[0]:
                 while path[p].coordinates[0] == path[p + 1].coordinates[0]:

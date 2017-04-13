@@ -1,3 +1,10 @@
+"""
+Filename:       SerialTest.py
+File type:      python test code
+Author:         Dominic Trottier
+Description:    Functions and script for testing serial communication
+"""
+
 import serial
 import time
 import sys
@@ -5,7 +12,7 @@ import sys
 def bit16ToString(num):
 	if num > 65535 or num < 0:
 		raise OverflowError
-	
+
 	c0 = chr(num & 0x00ff)
 	c1 = chr((num & 0xff00) >> 8)
 
@@ -91,4 +98,3 @@ if __name__ == '__main__':
 	testsend(port, '<uh oh', '')
 	testsend(port, 'begin>', '')
 	testsend(port, 'dfjdkl', '')
-	

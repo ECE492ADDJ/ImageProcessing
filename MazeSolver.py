@@ -143,6 +143,7 @@ class MazeSolver(object):
             planner = BallPathPlanner(self._path)
 
             with ServoConnection(port=self.serial_port) as conn:
+                # Get "flat" x and y positions of servos over serial connection
                 try:
                     flat_x = conn.get_x_val()
                     flat_y = conn.get_y_val()
@@ -155,20 +156,25 @@ class MazeSolver(object):
                         break
 
                     start_time = time.clock()
+                    # Get current image of maze
                     retval, self._current_image = camera.read()
                     if not retval:
                         raise IOError("Failed to read image from camera.")
 
+                    # Find ball, its acceleration, and where its currently trying to get to
                     self._ball_x, self._ball_y = ball_finder.findBall(self._current_image)
                     self._acc_x, self._acc_y = planner.getAcceleration(self._ball_x, self._ball_y)
                     self._target_coords = planner.get_target_pos()
 
                     try:
+                        # Determine how to tilt the board next to acheive desired acceleraton and direction
                         new_x_acc = max(-1 * MAX_ACC, min(MAX_ACC, self._acc_x * ACC_MULTIPLIER + flat_x))
                         new_y_acc = max(-1 * MAX_ACC, min(MAX_ACC, self._acc_y * ACC_MULTIPLIER + flat_y))
+                        # Send command for x servo over serial
                         conn.set_x_val(int(new_x_acc))
                         self._ser_results.append(1)
                         time.sleep(0.001)
+                        # Send command for y servo over serial
                         conn.set_y_val(int(new_y_acc))
                         self._ser_results.append(1)
                     except SerialException as ex:
@@ -181,7 +187,7 @@ class MazeSolver(object):
 
                 self._finished = planner.isFinished()
 
-            # TODO: Release camera under all circumstances
+            # Release camera
             camera.release()
 
     def is_finished(self):

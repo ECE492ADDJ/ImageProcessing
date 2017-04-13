@@ -1,3 +1,10 @@
+"""
+Filename:       StopWatch.py
+File type:      python class
+Author:         Jacob Charlebois
+Description:    Class defining functionality of a stopwatch widget for the GUI
+"""
+
 from PIL import ImageTk
 from Tkinter import *
 import time

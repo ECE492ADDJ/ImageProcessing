@@ -1,5 +1,11 @@
 #!/usr/bin/python
 """
+Filename:       Node.py
+Author:			David Ross, Jake Charlebois
+File type:      python class
+Created on:     2017-02-06
+Description:    Class defining Node objects that make up maze graph
+
 Node class tests
 >>> A = Node()
 >>> A.neighbours = [1, 2, 3]
@@ -7,7 +13,7 @@ Node class tests
 >>> A.coordinates = (2, 2)
 >>> A.neighbours
 [1, 2, 3]
->>> A.start 
+>>> A.start
 True
 >>> A.coordinates
 (2, 2)
