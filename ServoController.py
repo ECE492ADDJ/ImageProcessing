@@ -46,6 +46,7 @@ class ServoConnection:
         return resp == self.__MSG_OPEN_CHAR + self.__ACK_STR + self.__MSG_CLOSE_CHAR
 
     def get_x_val(self):
+        """ Get the current position of the 'x' servo """
         if not self.serconn.is_open:
             self.serconn.open()
 
@@ -64,6 +65,7 @@ class ServoConnection:
         return -1 * twos_comp(int(match.group(1), 16), 16)
 
     def get_y_val(self):
+        """ Get the current position of the 'y' servo """
         if not self.serconn.is_open:
             self.serconn.open()
 
@@ -81,6 +83,7 @@ class ServoConnection:
         return twos_comp(int(match.group(1), 16), 16)
 
     def set_x_val(self, val):
+        """ Set the new position of the 'x' servo """
         if not self.serconn.is_open:
             self.serconn.open()
 
@@ -100,6 +103,7 @@ class ServoConnection:
             raise InvalidResponseException("SETX not acknowledged.")
 
     def set_y_val(self, val):
+        """ Set the new position of the 'y' servo """
         if not self.serconn.is_open:
             self.serconn.open()
 
